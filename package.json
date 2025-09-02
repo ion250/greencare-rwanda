@@ -8,6 +8,7 @@
     "build": "cd client && npm run build"
   },
   "dependencies": {
-    "concurrently": "^7.6.0"
+    "concurrently": "^7.6.0",
+    "gh-pages": "^6.3.0"
   }
 }
