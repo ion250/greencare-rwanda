@@ -11,6 +11,6 @@
     "concurrently": "^7.6.0"
   },
   "devDependencies": {
-    "gh-pages": "^6.3.0"
+    
   }
 }
