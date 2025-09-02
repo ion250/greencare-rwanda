@@ -1,0 +1,13 @@
+{
+  "name": "greencare-rwanda",
+  "version": "1.0.0",
+  "description": "Full-stack application for GreenCare Rwanda",
+  "scripts": {
+    "dev": "concurrently \"cd server && npm run dev\" \"cd client && npm run dev\"",
+    "start": "concurrently \"cd server && npm start\" \"cd client && npm start\"",
+    "build": "cd client && npm run build"
+  },
+  "dependencies": {
+    "concurrently": "^7.6.0"
+  }
+}
