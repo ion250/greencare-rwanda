@@ -49,13 +49,13 @@ export default function UserManagement() {
         return;
       }
 
-      const response = await axios.get('http://localhost:5000/api/users', {
+      const res = await axios.get('http://localhost:5000/api/users', {
         headers: {
-          'Authorization': token
+          Authorization: token
         }
       });
 
-      setUsers(response.data);
+      setUsers(res.data);
     } catch (err: any) {
       if (err.response?.status === 403) {
         setError('Access denied. Admin privileges required.');
@@ -67,7 +67,9 @@ export default function UserManagement() {
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
@@ -96,7 +98,7 @@ export default function UserManagement() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    
+
     if (!validateForm()) return;
 
     try {
@@ -109,21 +111,29 @@ export default function UserManagement() {
 
       if (!isEditing) {
         // Create new user
-        await axios.post('http://localhost:5000/api/users', {
-          ...userData,
-          password: formData.password
-        }, {
-          headers: {
-            'Authorization': token
+        await axios.post(
+          'http://localhost:5000/api/users',
+          {
+            ...userData,
+            password: formData.password
+          },
+          {
+            headers: {
+              Authorization: token
+            }
           }
-        });
+        );
       } else {
         // Update existing user
-        await axios.put(`http://localhost:5000/api/users/${editingUser?._id}`, userData, {
-          headers: {
-            'Authorization': token
+        await axios.put(
+          `http://localhost:5000/api/users/${editingUser?._id}`,
+          userData,
+          {
+            headers: {
+              Authorization: token
+            }
           }
-        });
+        );
       }
 
       // Reset form
@@ -136,7 +146,7 @@ export default function UserManagement() {
       });
       setIsEditing(false);
       setEditingUser(null);
-      
+
       // Refresh user list
       fetchUsers();
     } catch (err: any) {
@@ -159,21 +169,21 @@ export default function UserManagement() {
   const handleUpdateUserStatus = async (userId: string, status: string) => {
     try {
       const token = localStorage.getItem('authToken');
-      const response = await axios.put(
+      await axios.put(
         `http://localhost:5000/api/users/${userId}`,
         { status },
         {
           headers: {
-            'Authorization': token
+            Authorization: token
           }
         }
       );
 
       // Update local state
-      setUsers(users.map(user => 
+      setUsers(users.map(user =>
         user._id === userId ? { ...user, status } : user
       ));
-    } catch (err) {
+    } catch {
       setError('Failed to update user status');
     }
   };
@@ -187,13 +197,13 @@ export default function UserManagement() {
       const token = localStorage.getItem('authToken');
       await axios.delete(`http://localhost:5000/api/users/${userId}`, {
         headers: {
-          'Authorization': token
+          Authorization: token
         }
       });
 
       // Remove from local state
       setUsers(users.filter(user => user._id !== userId));
-    } catch (err) {
+    } catch {
       setError('Failed to delete user');
     }
   };
@@ -277,13 +287,13 @@ export default function UserManagement() {
             <h2 className="text-lg font-medium text-gray-900 mb-4">
               {editingUser ? 'Edit User' : 'Add New User'}
             </h2>
-            
+
             {error && (
               <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">
                 {error}
               </div>
             )}
-            
+
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -317,7 +327,7 @@ export default function UserManagement() {
                   />
                 </div>
               </div>
-              
+
               {!editingUser && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
@@ -352,7 +362,7 @@ export default function UserManagement() {
                   </div>
                 </div>
               )}
-              
+
               <div>
                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="role">
                   Role
@@ -370,7 +380,7 @@ export default function UserManagement() {
                   <option value="admin">Admin</option>
                 </select>
               </div>
-              
+
               <div className="flex items-center justify-end">
                 <button
                   type="button"
@@ -432,19 +442,26 @@ export default function UserManagement() {
                       <div className="text-sm text-gray-500">{user.email}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        user.role === 'admin' ? 'bg-red-100 text-red-800' :
-                        user.role === 'editor' ? 'bg-blue-100 text-blue-800' :
-                        user.role === 'staff' ? 'bg-green-100 text-green-800' :
-                        'bg-gray-100 text-gray-800'
-                      }`}>
+                      <span
+                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          user.role === 'admin'
+                            ? 'bg-red-100 text-red-800'
+                            : user.role === 'editor'
+                            ? 'bg-blue-100 text-blue-800'
+                            : user.role === 'staff'
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-gray-100 text-gray-800'
+                        }`}
+                      >
                         {user.role}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <select
                         value={user.status}
-                        onChange={(e) => handleUpdateUserStatus(user._id, e.target.value)}
+                        onChange={(e) =>
+                          handleUpdateUserStatus(user._id, e.target.value)
+                        }
                         className="text-sm border-gray-300 rounded-md"
                       >
                         <option value="active">Active</option>
@@ -465,7 +482,10 @@ export default function UserManagement() {
                       <button
                         onClick={() => handleDeleteUser(user._id)}
                         className="text-red-600 hover:text-red-900"
-                        disabled={user._id === JSON.parse(localStorage.getItem('user') || '{}').id}
+                        disabled={
+                          user._id ===
+                          JSON.parse(localStorage.getItem('user') || '{}').id
+                        }
                       >
                         Delete
                       </button>
@@ -477,6 +497,4 @@ export default function UserManagement() {
           </div>
         </div>
       </div>
-    </div>
-  );
-}
+    </div>  );}
