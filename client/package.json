@@ -1,5 +1,5 @@
-{
-  "name": "client",
+{  "name": "client",
+  "homepage": "https://greencarerwandaltd.github.io/greencare-rwanda/",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -10,7 +10,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "predeploy":"npm run build",
-    "deploy":"gh-pages -d dist"
+    "deploy": "gh-pages -d build"
   },
   "dependencies": {
     "@tinymce/tinymce-react": "^6.3.0",
