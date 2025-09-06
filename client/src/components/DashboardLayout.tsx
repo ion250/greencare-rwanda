@@ -33,6 +33,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 7v10c0 2 1 3 3 3h10c2 0 3-1 3-3V7c0-2-1-3-3-3H7c-2 0-3 1-3 3z" />
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V5c0-1 1-2 2-2h4c1 0 2 1 2 2v2M8 17v-2h8v2" />
       </svg>
+    )},
+     { path: '/dashboard/order', label: 'Order', icon: (
+      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                  </svg>
     )}
   ];
 
@@ -40,6 +45,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const visibleItems = navItems.filter(item => item.visible !== false);
 
   return (
+    
     <div className="min-h-screen bg-gray-100">
       {/* Mobile sidebar */}
       <div className={`fixed inset-0 z-40 md:hidden ${sidebarOpen ? 'block' : 'hidden'}`}>
@@ -97,6 +103,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </div>
 
       {/* Static sidebar for desktop */}
+      
       <div className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0">
         <div className="flex-1 flex flex-col min-h-0 bg-green-800">
           <div className="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">

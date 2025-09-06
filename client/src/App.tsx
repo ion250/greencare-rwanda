@@ -15,6 +15,8 @@ import ArticleManagement from './pages/ArticleManagement'
 import ProductManagement from './pages/ProductManagement'
 import ProtectedRoute from './components/ProtectedRoute'
 import { ErrorBoundary } from './components/ErrorBoundary'
+import Order from './pages/Order'
+import OrderManagement from './pages/OrderManagement'
 function App() {
   return (
     <BrowserRouter>
@@ -27,6 +29,7 @@ function App() {
             <Route path="/about" element={<About />} />
             <Route path="/products" element={<Products />} />
             <Route path="/services" element={<Services />} />
+            <Route path="/order" element={<Order />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/:slug" element={<ArticleDetail />} />
             <Route path="/contact" element={<Contact />} />
@@ -38,7 +41,8 @@ function App() {
               <Route path="/dashboard/users" element={<UserManagement />} />
               <Route path="/dashboard/articles" element={<ArticleManagement />} />
               <Route path="/dashboard/products" element={<ProductManagement />} />
-            </Route>
+              <Route path="/dashboard/order" element={<OrderManagement/>} />
+              </Route>
           </Routes>
           </ErrorBoundary>
         </main>

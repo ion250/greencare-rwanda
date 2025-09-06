@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import type { FormEvent, ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import DashboardLayout from '../components/DashboardLayout';
 
 interface Product {
   _id: string;
@@ -203,202 +204,182 @@ export default function ProductManagement() {
     setShowAddProduct(true);
   };
 
-  if (loading) {
-    return (
-      <div className="py-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-          <h1 className="text-2xl font-semibold text-gray-900 mb-8">Product Management</h1>
+  return (
+    <DashboardLayout>
+      <div className="pt-16"></div>
+          <div className="py-6"></div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+        {loading ? (
           <div className="flex justify-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-600"></div>
           </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="py-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-          <h1 className="text-2xl font-semibold text-gray-900 mb-8">Product Management</h1>
+        ) : error ? (
           <div className="bg-red-100 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-6">
             {error}
           </div>
-          {error.includes('Admin privileges') && (
-            <button
-              onClick={() => navigate('/dashboard')}
-              className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
-            >
-              Back to Dashboard
-            </button>
-          )}
-        </div>
-      </div>
-    );
-  }
+        ) : (
+          <>
+            <div className="flex justify-between items-center mb-8">
+              <h1 className="text-2xl font-semibold text-gray-900">Product Management</h1>
+              <button
+                onClick={openAddProductModal}
+                className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
+              >
+                Add New Product
+              </button>
+            </div>
 
-  return (
-    <div className="py-6">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-2xl font-semibold text-gray-900">Product Management</h1>
-          <button
-            onClick={openAddProductModal}
-            className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
-          >
-            Add New Product
-          </button>
-        </div>
+            {/* Add/Edit Product Modal */}
+            {showAddProduct && (
+              <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+                <div className="relative top-10 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
+                  <div className="mt-3">
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="text-lg leading-6 font-medium text-gray-900">
+                        {editingProduct ? 'Edit Product' : 'Add New Product'}
+                      </h3>
+                      <button
+                        onClick={() => {
+                          setShowAddProduct(false);
+                          setEditingProduct(null);
+                        }}
+                        className="text-gray-400 hover:text-gray-600"
+                      >
+                        <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
 
-        {/* Add/Edit Product Modal */}
-        {showAddProduct && (
-          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-            <div className="relative top-10 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
-              <div className="mt-3">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg leading-6 font-medium text-gray-900">
-                    {editingProduct ? 'Edit Product' : 'Add New Product'}
-                  </h3>
-                  <button
-                    onClick={() => {
-                      setShowAddProduct(false);
-                      setEditingProduct(null);
-                    }}
-                    className="text-gray-400 hover:text-gray-600"
-                  >
-                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                </div>
-
-                {error && (
-                  <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">
-                    {error}
-                  </div>
-                )}
-
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div>
-                    <label htmlFor="name" className="block text-gray-700 text-sm font-bold mb-2">Product Name</label>
-                    <input
-                      id="name"
-                      type="text"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="description" className="block text-gray-700 text-sm font-bold mb-2">Description</label>
-                    <textarea
-                      id="description"
-                      name="description"
-                      value={formData.description}
-                      onChange={handleTextareaChange} // Use the dedicated handler here
-                      rows={4}
-                      className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="price" className="block text-gray-700 text-sm font-bold mb-2">Price</label>
-                    <input
-                      id="price"
-                      type="number"
-                      name="price"
-                      value={formData.price}
-                      onChange={handleInputChange}
-                      className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="category" className="block text-gray-700 text-sm font-bold mb-2">Category</label>
-                    <select
-                      id="category"
-                      name="category"
-                      value={formData.category}
-                      onChange={handleInputChange}
-                      className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    >
-                      <option value="compost">Compost</option>
-                      <option value="biowaste">Biowaste</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label htmlFor="image" className="block text-gray-700 text-sm font-bold mb-2">Product Image</label>
-                    <input
-                      id="image"
-                      type="file"
-                      name="image"
-                      accept="image/*"
-                      onChange={handleImageChange}
-                      className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    />
-                    {formData.imageUrl && (
-                      <div className="mt-4">
-                        <img src={formData.imageUrl} alt="Product Preview" className="h-40 object-cover" />
+                    {error && (
+                      <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">
+                        {error}
                       </div>
                     )}
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <button
-                      type="submit"
-                      className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 focus:outline-none focus:shadow-outline"
-                    >
-                      {editingProduct ? 'Update Product' : 'Add Product'}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setShowAddProduct(false);
-                        setEditingProduct(null);
-                      }}
-                      className="bg-gray-400 text-white px-4 py-2 rounded-md hover:bg-gray-500 focus:outline-none focus:shadow-outline"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-        )}
 
-        {/* Product List */}
-        <div className="bg-white shadow overflow-hidden sm:rounded-md">
-          <ul className="divide-y divide-gray-200">
-            {products.map(product => (
-              <li key={product._id} className="p-4 sm:p-6 flex items-center justify-between hover:bg-gray-50">
-                <div className="flex items-center">
-                  <img src={`http://localhost:5000/${product.image}`} alt={product.name} className="h-16 w-16 object-cover rounded-md mr-4" />
-                  <div>
-                    <p className="text-lg font-semibold text-gray-900">{product.name}</p>
-                    <p className="text-gray-500">{product.category}</p>
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                      <div>
+                        <label htmlFor="name" className="block text-gray-700 text-sm font-bold mb-2">Product Name</label>
+                        <input
+                          id="name"
+                          type="text"
+                          name="name"
+                          value={formData.name}
+                          onChange={handleInputChange}
+                          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor="description" className="block text-gray-700 text-sm font-bold mb-2">Description</label>
+                        <textarea
+                          id="description"
+                          name="description"
+                          value={formData.description}
+                          onChange={handleTextareaChange} // Use the dedicated handler here
+                          rows={4}
+                          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor="price" className="block text-gray-700 text-sm font-bold mb-2">Price</label>
+                        <input
+                          id="price"
+                          type="number"
+                          name="price"
+                          value={formData.price}
+                          onChange={handleInputChange}
+                          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor="category" className="block text-gray-700 text-sm font-bold mb-2">Category</label>
+                        <select
+                          id="category"
+                          name="category"
+                          value={formData.category}
+                          onChange={handleInputChange}
+                          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        >
+                          <option value="compost">Compost</option>
+                          <option value="biowaste">Biowaste</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label htmlFor="image" className="block text-gray-700 text-sm font-bold mb-2">Product Image</label>
+                        <input
+                          id="image"
+                          type="file"
+                          name="image"
+                          accept="image/*"
+                          onChange={handleImageChange}
+                          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        />
+                        {formData.imageUrl && (
+                          <div className="mt-4">
+                            <img src={formData.imageUrl} alt="Product Preview" className="h-40 object-cover" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <button
+                          type="submit"
+                          className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 focus:outline-none focus:shadow-outline"
+                        >
+                          {editingProduct ? 'Update Product' : 'Add Product'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowAddProduct(false);
+                            setEditingProduct(null);
+                          }}
+                          className="bg-gray-400 text-white px-4 py-2 rounded-md hover:bg-gray-500 focus:outline-none focus:shadow-outline"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </form>
                   </div>
                 </div>
-                <div className="flex-shrink-0">
-                  <span className="text-green-600 font-bold mr-4">${product.price}</span>
-                  <button
-                    onClick={() => handleEditProduct(product)}
-                    className="text-indigo-600 hover:text-indigo-900 font-medium mr-4"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDeleteProduct(product._id)}
-                    className="text-red-600 hover:text-red-900 font-medium"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
+              </div>
+            )}
+
+            {/* Product List */}
+            <div className="bg-white shadow overflow-hidden sm:rounded-md">
+              <ul className="divide-y divide-gray-200">
+                {products.map(product => (
+                  <li key={product._id} className="p-4 sm:p-6 flex items-center justify-between hover:bg-gray-50">
+                    <div className="flex items-center">
+                      <img src={`http://localhost:5000/${product.image}`} alt={product.name} className="h-16 w-16 object-cover rounded-md mr-4" />
+                      <div>
+                        <p className="text-lg font-semibold text-gray-900">{product.name}</p>
+                        <p className="text-gray-500">{product.category}</p>
+                      </div>
+                    </div>
+                    <div className="flex-shrink-0">
+                      <span className="text-green-600 font-bold mr-4">${product.price}</span>
+                      <button
+                        onClick={() => handleEditProduct(product)}
+                        className="text-indigo-600 hover:text-indigo-900 font-medium mr-4"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDeleteProduct(product._id)}
+                        className="text-red-600 hover:text-red-900 font-medium"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </>
+        )}
       </div>
-    </div>
+    </DashboardLayout>
   );
 }
