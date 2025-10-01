@@ -21,17 +21,18 @@ export default function Navbar() {
 
   return (
     <nav className="bg-white shadow-sm fixed w-full top-0 z-50"> 
-  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div className="flex justify-between h-16">
-      <div className="flex items-center">
-        <Link to="/" className="flex-shrink-0 flex items-center">
-          <img 
-            src="./src/images/g-logo.svg" 
-            alt="GreenCare Rwanda Logo" 
-            className="h-[80px] w-auto"
-          />
-        </Link>
-      </div>          
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between h-16">
+          <div className="flex items-center">
+            <Link to="/" className="flex-shrink-0 flex items-center">
+              <img 
+                src="./src/images/g-logo.svg" 
+                alt="GreenCare Rwanda Logo" 
+                className="h-[80px] w-auto"
+              />
+            </Link>
+          </div>          
+          
           {/* Desktop menu */}
           <div className="hidden md:ml-6 md:flex md:items-center md:space-x-8">
             <Link to="/" className={`px-3 py-2 rounded-md text-sm font-medium ${isActive('/')}`}>
@@ -49,22 +50,21 @@ export default function Navbar() {
             <Link to="/blog" className={`px-3 py-2 rounded-md text-sm font-medium ${isActive('/blog')}`}>
               Blog
             </Link>
+            <Link to="/ourteam" className={`px-3 py-2 rounded-md text-sm font-medium ${isActive('/ourteam')}`}>
+              Our Team
+            </Link>
             <Link to="/contact" className={`px-3 py-2 rounded-md text-sm font-medium ${isActive('/contact')}`}>
               Contact
             </Link>
             
-            {/* Login/Logout based on authentication status */}
-            {isLoggedIn ? (
+            {/* Only show Logout button when logged in */}
+            {isLoggedIn && (
               <button
                 onClick={handleLogout}
                 className="ml-4 bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-red-700 transition-colors"
               >
                 Logout
               </button>
-            ) : (
-              <Link to="/login" className="ml-4 bg-green-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-green-700 transition-colors">
-                Login
-              </Link>
             )}
           </div>
 
@@ -129,11 +129,18 @@ export default function Navbar() {
             className={`block px-3 py-2 rounded-md text-base font-medium ${isActive('/contact')}`}
             onClick={() => setIsMenuOpen(false)}
           >
+            Our Team
+          </Link>
+          <Link
+            to="/contact"
+            className={`block px-3 py-2 rounded-md text-base font-medium ${isActive('/contact')}`}
+            onClick={() => setIsMenuOpen(false)}
+          >
             Contact
           </Link>
           
-          {/* Login/Logout for mobile */}
-          {isLoggedIn ? (
+          {/* Only show Logout button when logged in for mobile */}
+          {isLoggedIn && (
             <button
               onClick={() => {
                 handleLogout();
@@ -143,14 +150,6 @@ export default function Navbar() {
             >
               Logout
             </button>
-          ) : (
-            <Link
-              to="/login"
-              className="block w-full text-left mt-2 bg-green-600 text-white px-3 py-2 rounded-md text-base font-medium hover:bg-green-700 transition-colors"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Login
-            </Link>
           )}
         </div>
       </div>

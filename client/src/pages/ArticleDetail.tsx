@@ -13,20 +13,10 @@ interface Article {
   slug: string
 }
 
-interface SocialPost {
-  id: string
-  platform: 'facebook' | 'twitter'
-  content: string
-  image?: string
-  timestamp: string
-  url: string
-}
-
 export default function ArticleDetail() {
   const { slug } = useParams()
   const [article, setArticle] = useState<Article | null>(null)
   const [relatedArticles, setRelatedArticles] = useState<Article[]>([])
-  const [socialPosts, setSocialPosts] = useState<SocialPost[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [imageMode, setImageMode] = useState<'fit' | 'original'>('fit')
@@ -77,42 +67,6 @@ export default function ArticleDetail() {
         }));
       
       setRelatedArticles(formattedArticles);
-
-      // Mock social media posts (in a real app, this would come from API calls to Facebook/Twitter)
-      const mockSocialPosts: SocialPost[] = [
-        {
-          id: '1',
-          platform: 'facebook',
-          content: 'Just read an amazing article about sustainable farming practices in Rwanda. The insights on composting are game-changing!',
-          image: 'https://example.com/fb-post1.jpg',
-          timestamp: '2023-06-15T10:30:00Z',
-          url: 'https://facebook.com/greencarerwanda/posts/1'
-        },
-        {
-          id: '2',
-          platform: 'twitter',
-          content: 'Innovative plastic recycling solutions are transforming waste management in Rwanda. Check out this insightful article!',
-          timestamp: '2023-06-14T15:45:00Z',
-          url: 'https://twitter.com/greencarerwanda/status/1'
-        },
-        {
-          id: '3',
-          platform: 'facebook',
-          content: 'Our team is proud to contribute to a greener Rwanda through sustainable waste management practices.',
-          image: 'https://example.com/fb-post2.jpg',
-          timestamp: '2023-06-13T09:15:00Z',
-          url: 'https://facebook.com/greencarerwanda/posts/2'
-        },
-        {
-          id: '4',
-          platform: 'twitter',
-          content: 'Did you know that proper composting can reduce household waste by up to 30%? Learn how in our latest article.',
-          timestamp: '2023-06-12T13:20:00Z',
-          url: 'https://twitter.com/greencarerwanda/status/2'
-        }
-      ];
-      
-      setSocialPosts(mockSocialPosts);
       
     } catch (error: any) {
       console.error('Error fetching article:', error)
@@ -275,73 +229,59 @@ export default function ArticleDetail() {
                   </div>
                 </div>
                 
-                {/* Right Sidebar - Latest Updates */}
+                {/* Right Sidebar - Social Media Icons */}
                 <div className="lg:w-4/12">
                   <div className="sticky top-24">
                     <div className="bg-white rounded-lg shadow-md p-6">
-                      <h2 className="text-2xl font-bold text-green-800 mb-6">Latest Updates</h2>
-                      <div className="space-y-6">
-                        {socialPosts.map((post) => (
-                          <div key={post.id} className="border-b border-gray-200 pb-4 last:border-b-0">
-                            <div className="flex items-center mb-2">
-                              {post.platform === 'facebook' ? (
-                                <svg className="h-5 w-5 text-blue-600 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                                </svg>
-                              ) : (
-                                <svg className="h-5 w-5 text-blue-400 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                                  <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
-                                </svg>
-                              )}
-                              <span className="text-sm font-medium text-gray-700 capitalize">{post.platform}</span>
-                            </div>
-                            
-                            <p className="text-gray-700 text-sm mb-2">{post.content}</p>
-                            
-                            {post.image && (
-                              <div className="mb-2">
-                                <img 
-                                  src={post.image} 
-                                  alt="Social post" 
-                                  className="w-full h-24 object-cover rounded"
-                                />
-                              </div>
-                            )}
-                            
-                            <a 
-                              href={post.url} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className="text-green-600 text-xs hover:text-green-800"
-                            >
-                              View on {post.platform}
-                            </a>
-                            
-                            <div className="text-xs text-gray-500 mt-1">
-                              {new Date(post.timestamp).toLocaleDateString()} at {new Date(post.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
+                      <h2 className="text-2xl font-bold text-green-800 mb-6">Connect With Us</h2>
                       
-                      <div className="mt-6 pt-6 border-t border-gray-200">
-                        <p className="text-sm text-gray-600 mb-4">Follow us for more updates:</p>
-                        <div className="flex space-x-4">
+                      
+                      <div className="mt-8 pt-6 border-t border-gray-200">
+                        <p className="text-sm text-gray-600 mb-4 text-center">Follow us for more updates and insights:</p>
+                        <div className="flex flex-wrap justify-center gap-3">
                           <a 
-                            href="https://facebook.com/greencarerwanda" 
+                            href="https://x.com/GreencareRwanda" 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700"
+                            className="bg-black text-white px-4 py-2 rounded-md hover:bg-gray-800 transition-colors text-sm font-medium flex items-center"
                           >
+                            <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                            </svg>
+                            X (Twitter)
+                          </a>
+                          <a 
+                            href="https://web.facebook.com/profile.php?id=100063590337079" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors text-sm font-medium flex items-center"
+                          >
+                            <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                            </svg>
                             Facebook
                           </a>
                           <a 
-                            href="https://twitter.com/greencarerwanda" 
+                            href="https://www.linkedin.com/company/106267198/admin/dashboard/" 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            className="bg-blue-400 text-white px-3 py-1 rounded text-sm hover:bg-blue-500"
+                            className="bg-blue-700 text-white px-4 py-2 rounded-md hover:bg-blue-800 transition-colors text-sm font-medium flex items-center"
                           >
-                            Twitter
+                            <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                            </svg>
+                            LinkedIn
+                          </a>
+                          <a 
+                            href="https://www.youtube.com/@greencarerwandaltd" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors text-sm font-medium flex items-center"
+                          >
+                            <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                            </svg>
+                            YouTube
                           </a>
                         </div>
                       </div>

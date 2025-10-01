@@ -6,6 +6,7 @@ import About from './pages/About'
 import Products from './pages/Products'
 import Services from './pages/Services'
 import Blog from './pages/Blog'
+import Ourteam from './pages/Ourteam'
 import ArticleDetail from './pages/ArticleDetail'
 import Contact from './pages/Contact'
 import Login from './pages/Login'
@@ -17,6 +18,10 @@ import ProtectedRoute from './components/ProtectedRoute'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import Order from './pages/Order'
 import OrderManagement from './pages/OrderManagement'
+import MessageManagement from './pages/MessageManagement'
+import PartnerManagement from './pages/PartnerManagement'
+import AdminPublishedDocuments from './components/AdminPublishedDocuments'
+import TestimonialManagement from './pages/TestimonialManagement'
 function App() {
   return (
     <BrowserRouter>
@@ -31,6 +36,7 @@ function App() {
             <Route path="/services" element={<Services />} />
             <Route path="/order" element={<Order />} />
             <Route path="/blog" element={<Blog />} />
+            <Route path="/ourteam" element={<Ourteam/>} />
             <Route path="/blog/:slug" element={<ArticleDetail />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/login" element={<Login />} />
@@ -41,7 +47,12 @@ function App() {
               <Route path="/dashboard/users" element={<UserManagement />} />
               <Route path="/dashboard/articles" element={<ArticleManagement />} />
               <Route path="/dashboard/products" element={<ProductManagement />} />
-              <Route path="/dashboard/order" element={<OrderManagement/>} />
+              <Route path="/dashboard/orders" element={<OrderManagement/>} />
+              <Route path="/dashboard/messages" element={<MessageManagement/>} />
+              <Route path="/dashboard/partners" element={<PartnerManagement/>} />
+              <Route path="/dashboard/testimonials" element={<TestimonialManagement/>} />
+              <Route path="/dashboard/docs" element={<AdminPublishedDocuments/>} />
+
               </Route>
           </Routes>
           </ErrorBoundary>
