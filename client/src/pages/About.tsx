@@ -429,7 +429,7 @@ export default function AboutPage() {
                       <div>
                         <h4 className="text-xl font-bold text-green-700">Founding Story:</h4>
                         <p className="text-gray-700 text-lg leading-relaxed">
-                          Greencare Rwanda Ltd. was established in July 2016 and brainchild of four ambitious entrepreneurs by Mr. Noel Nizeyimana CEO of Greencare Rwanda Ltd and co-founder, Mr. Christian Alain Ruzindana Chairman of the Board and Co Founder, Member of the Board and co-founder Mr Francis Mizinduko and Member of the Board and co-founder Mr. united by their shared vision and diverse expertise in soil and environmental management, civil engineering, and crop science, they graduated from the University of Rwanda in 2015 with a burning desire to revolutionize waste management and Agricultural production in Rwanda.
+                          Greencare Rwanda Ltd. was established in July 2016 and brainchild of four ambitious entrepreneurs by Mr. Noel Nizeyimana CEO of Greencare Rwanda Ltd and co-founder, Mr. Christian Alain Ruzindana Chairman of the Board and Co Founder, Member of the Board and co-founder Mr Francis Mizinduko and Mr. Iyakaremye Jean Paul, Member of the Board and co-founder united by their shared vision and diverse expertise in soil and environmental management, civil engineering, and crop science, they graduated from the University of Rwanda in 2015 with a burning desire to revolutionize waste management and Agricultural production in Rwanda.
                         </p>
                       </div>
                       

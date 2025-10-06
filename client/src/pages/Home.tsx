@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 
-// Define Types
+// Types
 interface Article {
   _id: string;
   title: string;
@@ -35,6 +35,8 @@ interface Partner {
   createdAt: string;
 }
 
+const API_BASE = "http://localhost:5000";
+
 export default function Home() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
@@ -46,14 +48,13 @@ export default function Home() {
   const [animatedWasteCount, setAnimatedWasteCount] = useState(0);
   const [animatedCompostCount, setAnimatedCompostCount] = useState(0);
   const [animatedJobsCount, setAnimatedJobsCount] = useState(0);
+  const [currentHeroImageIndex, setCurrentHeroImageIndex] = useState(0);
 
   // Carousel & Pagination
   const [currentTestimonialIndex, setCurrentTestimonialIndex] = useState(0);
   const [partnerPage, setPartnerPage] = useState(0);
   const autoPlayIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const carouselRef = useRef<HTMLDivElement>(null);
-
-  const API_BASE = "http://localhost:5000";
 
   useEffect(() => {
     fetchLatestArticles();
@@ -64,6 +65,13 @@ export default function Home() {
       if (autoPlayIntervalRef.current) clearInterval(autoPlayIntervalRef.current);
     };
   }, []);
+   useEffect(() => {
+  const interval = setInterval(() => {
+    setCurrentHeroImageIndex((prev) => (prev + 1) % heroImages.length);
+  }, 5000); // Change image every 5 seconds
+
+  return () => clearInterval(interval);
+}, []);
 
   useEffect(() => {
     if (!loading && articles.length > 0) {
@@ -89,6 +97,25 @@ export default function Home() {
     if (autoPlayIntervalRef.current) clearInterval(autoPlayIntervalRef.current);
     startAutoPlay();
   };
+  // Hero images list
+const heroImages = [
+  "/images/workers.jpg",
+  "/images/workers1.png",
+  "/images/workers2.jpg",
+  "/images/workers3.png",
+  "/images/workers4.jpg",
+  "/images/workers5.jpg",
+  "/images/workers6.png",
+  "/images/workers7.jpg",
+  "/images/workers8.jpg",
+  "/images/workers9.jpg",
+  "/images/workers10.jpg",
+  "/images/workers11.jpg",
+  "/images/workers12.jpg",
+  "/images/workers13.jpg",
+  "/images/workers14.jpg",
+  "/images/workers15.png"
+];
 
   const handleNextTestimonial = () => {
     resetAutoPlay();
@@ -104,11 +131,9 @@ export default function Home() {
     );
   };
 
-  
-
   const animateNumbers = () => {
     const duration = 2000;
-    const frames = (duration / 1000) * 60;
+    const frames = Math.round(duration / (1000 / 60));
 
     const incWaste = 2_000_000 / frames;
     const incCompost = 4000 / frames;
@@ -172,34 +197,63 @@ export default function Home() {
     partnerPage * ITEMS_PER_PAGE,
     (partnerPage + 1) * ITEMS_PER_PAGE
   );
+ 
 
   return (
     <div className="min-h-screen bg-white pt-16">
-      {/* Hero Section */}
-      <section className="bg-green-800 text-white py-24 relative overflow-hidden">
-        <div className="absolute inset-0">
-          <img 
-            src="/images/workers.jpg" 
-            alt="GreenCare Rwanda Workers"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-black bg-opacity-40"></div>
-        </div>
-        <div className="container mx-auto px-4 text-center relative z-10 flex items-center justify-center h-96">
-          <div>
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">Our Environment, Our Concern</h1>
-            <p className="text-lg md:text-xl opacity-90 mb-8">
-              Turning bio-waste into solutions for a greener Rwanda.
-            </p>
-            <Link
-              to="/about"
-              className="bg-green-600 text-white px-8 py-3 rounded-md hover:bg-green-700 transition-colors inline-flex items-center shadow-lg hover:shadow-xl transform hover:scale-105"
-            >
-              Learn More →
-            </Link>
-          </div>
-        </div>
-      </section>
+      {/* Hero Section with Fading Background Images */}
+<section className="bg-green-800 text-white py-24 relative overflow-hidden h-screen flex items-center">
+  {/* Background Images with Fade Effect */}
+  <div className="absolute inset-0 transition-opacity duration-1500 ease-in-out">
+    {heroImages.map((img, index) => (
+      <div
+        key={index}
+        className={`absolute inset-0 transition-opacity duration-1000 ${
+          index === currentHeroImageIndex ? 'opacity-100' : 'opacity-0'
+        }`}
+      >
+        <img
+          src={img}
+          alt={`Hero background ${index + 1}`}
+          className="w-full h-full object-cover"
+        />
+      </div>
+    ))}
+  </div>
+
+  {/* Overlay */}
+  <div className="absolute inset-0 bg-black bg-opacity-40"></div>
+
+  {/* Content */}
+  <div className="container mx-auto px-4 text-center relative z-10">
+    <h1 className="text-4xl md:text-5xl font-bold mb-4 animate-fade-in">
+      Our Environment, Our Concern
+    </h1>
+    <p className="text-lg md:text-xl opacity-90 mb-8 max-w-2xl mx-auto animate-fade-in-delay">
+      Turning bio-waste into solutions for a greener Rwanda.
+    </p>
+    <Link
+      to="/about"
+      className="bg-green-600 text-white px-8 py-3 rounded-md hover:bg-green-700 transition-colors inline-flex items-center shadow-lg hover:shadow-xl transform hover:scale-105"
+    >
+      Learn More →
+    </Link>
+  </div>
+
+  {/* Optional: Dots Indicator */}
+  <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex space-x-2 z-20">
+    {heroImages.map((_, index) => (
+      <button
+        key={index}
+        className={`w-3 h-3 rounded-full border border-white transition-all ${
+          index === currentHeroImageIndex ? 'bg-white' : 'bg-transparent'
+        }`}
+        onClick={() => setCurrentHeroImageIndex(index)}
+        aria-label={`Go to slide ${index + 1}`}
+      />
+    ))}
+  </div>
+</section>
 
       {/* About Us */}
       <section id="about" className="py-16 bg-gray-50">
@@ -361,7 +415,7 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {articles.length > 0 ? (
-              articles.map((article) => {
+              articles.slice(0, 3).map((article) => {
                 const imageUrl = article.image?.startsWith('http')
                   ? article.image
                   : `${API_BASE}${article.image}`;
@@ -372,7 +426,7 @@ export default function Home() {
                       alt={article.title}
                       className="w-full h-48 object-cover"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = '/uploads/placeholder.jpg';
+                        (e.target as HTMLImageElement).src = '/images/placeholder.jpg'; // ← Changed path
                       }}
                     />
                     <div className="p-6 flex-grow">
@@ -501,7 +555,7 @@ export default function Home() {
                         alt={partner.name}
                         className="max-h-16 mx-auto object-contain"
                         onError={(e) => {
-                          (e.target as HTMLImageElement).src = '/images/default-partner-logo.png';
+                          (e.target as HTMLImageElement).src = '/images/placeholder.jpg'; // ← Fixed fallback
                         }}
                       />
                     </div>
