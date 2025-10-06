@@ -443,30 +443,31 @@ function AddEditArticleModal({
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Content *</label>
             <Editor
-              apiKey={tinymceApiKey}
-              value={formData.content}
-              onEditorChange={(content) =>
-                onChange((prev) => ({ ...prev, content }))
-              }
-              init={{
-                height: 400,
-                menubar: true,
-                plugins: [
-                  'advlist', 'autolink', 'lists', 'link', 'image', 'charmap',
-                  'print', 'preview', 'anchor', 'searchreplace', 'visualblocks',
-                  'code', 'fullscreen', 'insertdatetime', 'media', 'table',
-                  'paste', 'help', 'wordcount'
-                ],
-                toolbar: `
-                  undo redo | formatselect | bold italic backcolor |
-                  alignleft aligncenter alignright alignjustify |
-                  bullist numlist outdent indent |
-                  link image media table | code fullscreen | help
-                `,
-                branding: false,
-                statusbar: true
-              }}
-            />
+  apiKey={tinymceApiKey}
+  value={formData.content}
+  onEditorChange={(content: string) => // ← Add :string here
+    onChange((prev) => ({ ...prev, content }))
+  }
+  init={{
+    height: 400,
+    menubar: true,
+    plugins: [
+      'advlist', 'autolink', 'lists', 'link', 'image', 'charmap',
+      'print', 'preview', 'anchor', 'searchreplace', 'visualblocks',
+      'code', 'fullscreen', 'insertdatetime', 'media', 'table',
+      'paste', 'help', 'wordcount'
+    ],
+    toolbar: `
+      undo redo | formatselect | bold italic backcolor |
+      alignleft aligncenter alignright alignjustify |
+      bullist numlist outdent indent |
+      link image media table | code fullscreen | help
+    `,
+    branding: false,
+    statusbar: true
+  }}
+/>
+            
           </div>
 
           <div>
