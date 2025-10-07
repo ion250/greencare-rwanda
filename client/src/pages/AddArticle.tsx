@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 
+const API_BASE = import.meta.env.VITE_API_BASE;
 export default function AddArticle() {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
@@ -45,7 +46,7 @@ export default function AddArticle() {
         formData.append('image', image)
       }
 
-      await axios.post('http://localhost:5000/api/articles', formData, {
+      await axios.post(`${API_BASE}/api/articles`, formData, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
           'Content-Type': 'multipart/form-data'

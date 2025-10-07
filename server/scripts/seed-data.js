@@ -8,10 +8,7 @@ const productsData = require('../data/products');
 const usersData = require('../data/users');
 
 // Connect to MongoDB
-mongoose.connect('mongodb://localhost:27017/greencare', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
+mongoose.connect('mongodb://localhost:27017/greencare', )
 .then(async () => {
   console.log('Connected to MongoDB');
   

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Editor } from '@tinymce/tinymce-react';
-
+const API_BASE = import.meta.env.VITE_API_BASE;
 interface Article {
   _id: string;
   title: string;
@@ -60,7 +60,7 @@ export default function ArticleManagement() {
       const token = localStorage.getItem('authToken');
       if (!token) return navigate('/login');
 
-      const res = await axios.get('http://localhost:5000/api/articles', {
+      const res = await axios.get(`${API_BASE}/api/articles`, {
         headers: {
           Authorization: token.startsWith('Bearer ') ? token : `Bearer ${token}`
         }
@@ -69,7 +69,7 @@ export default function ArticleManagement() {
       const formatted = res.data.map((a: Article) => ({
         ...a,
         image: a.image && !a.image.startsWith('http')
-          ? `http://localhost:5000${a.image}`
+          ? `${API_BASE}${a.image}`
           : a.image
       }));
 
@@ -117,11 +117,11 @@ export default function ArticleManagement() {
 
     try {
       if (editingArticle) {
-        await axios.put(`http://localhost:5000/api/articles/${editingArticle._id}`, fd, {
+        await axios.put(`${API_BASE}/api/articles/${editingArticle._id}`, fd, {
           headers: { Authorization: token!, 'Content-Type': 'multipart/form-data' }
         });
       } else {
-        await axios.post('http://localhost:5000/api/articles', fd, {
+        await axios.post(`${API_BASE}/api/articles`, fd, {
           headers: { Authorization: token!, 'Content-Type': 'multipart/form-data' }
         });
       }
@@ -153,7 +153,7 @@ export default function ArticleManagement() {
     if (!window.confirm('Are you sure you want to delete this article?')) return;
     try {
       const token = localStorage.getItem('authToken');
-      await axios.delete(`http://localhost:5000/api/articles/${_id}`, {
+      await axios.delete(`${API_BASE}/api/articles/${_id}`, {
         headers: { Authorization: token! }
       });
       setArticles(articles.filter(a => a._id !== _id));

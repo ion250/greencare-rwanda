@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 
 import axios from 'axios';
-
+const API_BASE = import.meta.env.VITE_API_BASE;
 // Types
 interface Article {
   _id: string;
@@ -52,19 +52,19 @@ export default function Blog() {
         const config = token ? { headers: { Authorization: token } } : {};
 
         // Fetch articles
-        const articleRes = await axios.get('http://localhost:5000/api/articles', config);
+        const articleRes = await axios.get(`${API_BASE}/api/articles`, config);
         const formattedArticles = articleRes.data.map((article: Article) => ({
           ...article,
           image: article.image
             ? article.image.startsWith('http')
               ? article.image
-              : `http://localhost:5000${article.image}`
+              : `${API_BASE}${article.image}`
             : '/uploads/placeholder.jpg',
         }));
         setArticles(formattedArticles);
 
         // Fetch published documents
-        const docRes = await axios.get('http://localhost:5000/api/documents');
+        const docRes = await axios.get(`${API_BASE}/api/documents`);
         const sortedDocs = docRes.data.documents.sort(
           (a: PublishedDocument, b: PublishedDocument) =>
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -309,7 +309,7 @@ export default function Blog() {
                           <h3 className="font-bold text-gray-800 mb-2">{doc.title}</h3>
                           <p className="text-gray-700 text-sm mb-3 line-clamp-2">{doc.description}</p>
                           <a
-                            href={`http://localhost:5000${doc.fileUrl}`}
+                            href={`${API_BASE}${doc.fileUrl}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="inline-flex items-center text-blue-600 hover:text-blue-800 text-sm font-medium"

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import DashboardLayout from '../components/DashboardLayout';
-
+const API_BASE = import.meta.env.VITE_API_BASE;
 interface Partner {
   _id: string;
   name: string;
@@ -43,7 +43,7 @@ export default function PartnerManagement() {
         return;
       }
 
-      const response = await axios.get('http://localhost:5000/api/partners', {
+      const response = await axios.get(`${API_BASE}/api/partners`, {
         headers: {
           'Authorization': token
         }

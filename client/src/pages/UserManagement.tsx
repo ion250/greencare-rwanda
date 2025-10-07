@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import DashboardLayout from '../components/DashboardLayout';
-
+const API_BASE = import.meta.env.VITE_API_BASE;
 interface User {
   _id: string;
   name: string;
@@ -50,7 +50,7 @@ export default function UserManagement() {
         return;
       }
 
-      const res = await axios.get('http://localhost:5000/api/users', {
+      const res = await axios.get(`${API_BASE}/api/users`, {
         headers: {
           Authorization: token
         }
@@ -113,7 +113,7 @@ export default function UserManagement() {
       if (!isEditing) {
         // Create new user
         await axios.post(
-          'http://localhost:5000/api/users',
+          `${API_BASE}/api/users`,
           {
             ...userData,
             password: formData.password
@@ -127,7 +127,7 @@ export default function UserManagement() {
       } else {
         // Update existing user
         await axios.put(
-          `http://localhost:5000/api/users/${editingUser?._id}`,
+          `${API_BASE}/api/users/${editingUser?._id}`,
           userData,
           {
             headers: {
@@ -171,7 +171,7 @@ export default function UserManagement() {
     try {
       const token = localStorage.getItem('authToken');
       await axios.put(
-        `http://localhost:5000/api/users/${userId}`,
+        `${API_BASE}/api/users/${userId}`,
         { status },
         {
           headers: {
@@ -196,7 +196,7 @@ export default function UserManagement() {
 
     try {
       const token = localStorage.getItem('authToken');
-      await axios.delete(`http://localhost:5000/api/users/${userId}`, {
+      await axios.delete(`${API_BASE}/api/users/${userId}`, {
         headers: {
           Authorization: token
         }

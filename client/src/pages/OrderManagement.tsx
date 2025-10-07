@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import DashboardLayout from '../components/DashboardLayout'
-
+const API_BASE = import.meta.env.VITE_API_BASE;
 interface Order {
   _id: string
   name: string
@@ -38,7 +38,7 @@ export default function OrderManagement() {
         return
       }
 
-      const res = await axios.get('http://localhost:5000/api/orders', {
+      const res = await axios.get(`${API_BASE}/api/orders`, {
         headers: { Authorization: token }
       })
 
@@ -63,7 +63,7 @@ export default function OrderManagement() {
       }
 
       await axios.put(
-        `http://localhost:5000/api/orders/${orderId}/status`,
+       `${API_BASE}/api/orders/${orderId}/status`,
         { status: newStatus },
         { headers: { Authorization: token } }
       )

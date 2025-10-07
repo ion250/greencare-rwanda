@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import axios from 'axios'
-
+const API_BASE = import.meta.env.VITE_API_BASE;
 interface Article {
   _id: string
   title: string
@@ -36,7 +36,7 @@ export default function ArticleDetail() {
       } : {};
 
       // Fetch the main article
-      const articleResponse = await axios.get(`http://localhost:5000/api/articles/${slug}`, config)
+      const articleResponse = await axios.get(`${API_BASE}/api/articles/${slug}`, config)
       
       // Format the article image URL
       const formattedArticle = {
@@ -44,14 +44,14 @@ export default function ArticleDetail() {
         image: articleResponse.data.image ? 
           (articleResponse.data.image.startsWith('http') ? 
             articleResponse.data.image : 
-            `http://localhost:5000${articleResponse.data.image}`) : 
+            `${API_BASE}${articleResponse.data.image}`) : 
           '/uploads/placeholder.jpg'
       };
       
       setArticle(formattedArticle);
 
       // Fetch related articles (other articles from the same author)
-      const articlesResponse = await axios.get('http://localhost:5000/api/articles', config)
+      const articlesResponse = await axios.get(`${API_BASE}/api/articles`, config)
       
       // Format image URLs for related articles
       const formattedArticles = articlesResponse.data
@@ -62,7 +62,7 @@ export default function ArticleDetail() {
           image: a.image ? 
             (a.image.startsWith('http') ? 
               a.image : 
-              `http://localhost:5000${a.image}`) : 
+              `${API_BASE}${a.image}`) : 
             '/uploads/placeholder.jpg'
         }));
       

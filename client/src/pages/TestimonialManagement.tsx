@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import DashboardLayout from '../components/DashboardLayout';
-
+const API_BASE = import.meta.env.VITE_API_BASE;
 interface Testimonial {
   _id: string;
   name: string;
@@ -50,7 +50,7 @@ export default function TestimonialManagement() {
         return;
       }
 
-      const response = await axios.get('http://localhost:5000/api/testimonials', {
+      const response = await axios.get(`${API_BASE}/api/testimonials`, {
         headers: {
           'Authorization': token
         }
@@ -132,7 +132,7 @@ export default function TestimonialManagement() {
       if (isEditing && selectedTestimonial) {
         // Update existing testimonial
         const response = await axios.put(
-          `http://localhost:5000/api/testimonials/${selectedTestimonial._id}`,
+          `${API_BASE}/api/testimonials/${selectedTestimonial._id}`,
           formData,
           config
         );
@@ -141,7 +141,7 @@ export default function TestimonialManagement() {
       } else {
         // Create new testimonial
         const response = await axios.post(
-          'http://localhost:5000/api/testimonials',
+          `${API_BASE}/api/testimonials`,
           formData,
           config
         );
@@ -163,7 +163,7 @@ export default function TestimonialManagement() {
     try {
       const token = localStorage.getItem('authToken');
       await axios.delete(
-        `http://localhost:5000/api/testimonials/${id}`,
+        `${API_BASE}/api/testimonials/${id}`,
         {
           headers: {
             'Authorization': token

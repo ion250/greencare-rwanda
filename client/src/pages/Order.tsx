@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-
+const API_BASE = import.meta.env.VITE_API_BASE;
 // Define the form data type
 interface FormData {
   name: string;
@@ -94,7 +94,7 @@ export default function Order() {
         };
         
         // Send to API
-        const response = await axios.post('http://localhost:5000/api/orders', orderData);
+        const response = await axios.post(`${API_BASE}/api/orders`, orderData);
         
         if (response.data.success) {
           setLoading(false);

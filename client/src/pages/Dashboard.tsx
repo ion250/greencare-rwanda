@@ -1,7 +1,7 @@
 import DashboardLayout from '../components/DashboardLayout';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-
+const API_BASE = import.meta.env.VITE_API_BASE;
 export default function Dashboard() {
   const [stats, setStats] = useState({
     users: 0,
@@ -37,10 +37,10 @@ export default function Dashboard() {
       };
 
       const [usersRes, articlesRes, productsRes, ordersRes] = await Promise.all([
-        axios.get('http://localhost:5000/api/users/count', config).catch(() => ({ data: { count: 0 } })),
-        axios.get('http://localhost:5000/api/articles/count', config).catch(() => ({ data: { count: 0 } })),
-        axios.get('http://localhost:5000/api/products/count', config).catch(() => ({ data: { count: 0 } })),
-        axios.get('http://localhost:5000/api/orders/count', config).catch(() => ({ data: { count: 0 } }))
+        axios.get(`${API_BASE}/api/users/count`, config).catch(() => ({ data: { count: 0 } })),
+        axios.get(`${API_BASE}/api/articles/count`, config).catch(() => ({ data: { count: 0 } })),
+        axios.get(`${API_BASE}/api/products/count`, config).catch(() => ({ data: { count: 0 } })),
+        axios.get(`${API_BASE}/api/orders/count`, config).catch(() => ({ data: { count: 0 } }))
       ]);
 
       setStats({
@@ -51,7 +51,7 @@ export default function Dashboard() {
       });
 
       // Fetch real recent activity including orders
-      const activityRes = await axios.get('http://localhost:5000/api/activity/recent', config).catch(() => ({ data: [] }));
+      const activityRes = await axios.get(`${API_BASE}/api/activity/recent`, config).catch(() => ({ data: [] }));
       
       // If we can't get real data, use mock data
       const activityData = activityRes.data.length > 0 ? activityRes.data : [

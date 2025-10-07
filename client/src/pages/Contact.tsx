@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
-
+const API_BASE = import.meta.env.VITE_API_BASE;
 export default function Contact() {
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
@@ -59,7 +59,7 @@ export default function Contact() {
       setLoading(true);
       
       try {
-        const response = await axios.post('http://localhost:5000/api/messages', {
+        const response = await axios.post(`${API_BASE}/api/messages`, {
           name,
           email,
           phone,

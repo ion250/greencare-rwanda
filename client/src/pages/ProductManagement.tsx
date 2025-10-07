@@ -3,7 +3,7 @@ import type { FormEvent, ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import DashboardLayout from '../components/DashboardLayout';
-
+const API_BASE = import.meta.env.VITE_API_BASE;
 interface Product {
   _id: string;
   name: string;
@@ -46,7 +46,7 @@ export default function ProductManagement() {
         return;
       }
 
-      const response = await axios.get('http://localhost:5000/api/products', {
+      const response = await axios.get(`${API_BASE}/api/products`, {
         headers: {
           'Authorization': token
         }
@@ -123,7 +123,7 @@ export default function ProductManagement() {
 
       if (!editingProduct) {
         // Create new product
-        await axios.post('http://localhost:5000/api/products', formDataToSend, {
+        await axios.post(`${API_BASE}/api/products`, formDataToSend, {
           headers: {
             'Authorization': token,
             'Content-Type': 'multipart/form-data'
@@ -131,7 +131,7 @@ export default function ProductManagement() {
         });
       } else {
         // Update existing product
-        await axios.put(`http://localhost:5000/api/products/${editingProduct._id}`, formDataToSend, {
+        await axios.put(`${API_BASE}/api/products/${editingProduct._id}`, formDataToSend, {
           headers: {
             'Authorization': token,
             'Content-Type': 'multipart/form-data'
@@ -178,7 +178,7 @@ export default function ProductManagement() {
 
     try {
       const token = localStorage.getItem('authToken');
-      await axios.delete(`http://localhost:5000/api/products/${productId}`, {
+      await axios.delete(`${API_BASE}/api/products/${productId}`, {
         headers: {
           'Authorization': token
         }
@@ -352,7 +352,7 @@ export default function ProductManagement() {
                 {products.map(product => (
                   <li key={product._id} className="p-4 sm:p-6 flex items-center justify-between hover:bg-gray-50">
                     <div className="flex items-center">
-                      <img src={`http://localhost:5000/${product.image}`} alt={product.name} className="h-16 w-16 object-cover rounded-md mr-4" />
+                      <img src={`${API_BASE}${product.image}`} alt={product.name} className="h-16 w-16 object-cover rounded-md mr-4" />
                       <div>
                         <p className="text-lg font-semibold text-gray-900">{product.name}</p>
                         <p className="text-gray-500">{product.category}</p>
