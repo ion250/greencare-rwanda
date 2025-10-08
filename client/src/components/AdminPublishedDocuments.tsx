@@ -56,7 +56,7 @@ export default function AdminPublishedDocuments() {
         }
       };
 
-      const response = await axios.get(`${API_BASE}/api/documents`, config);
+      const response = await axios.get(`${API_BASE}api/documents`, config);
       
       // Sort by creation date (newest first)
       const sortedDocs = response.data.documents.sort((a: PublishedDocument, b: PublishedDocument) => 
@@ -169,7 +169,7 @@ export default function AdminPublishedDocuments() {
       if (editingDoc) {
         // Update existing document
         const result = await axios.put(
-          `${API_BASE}/api/documents/${editingDoc._id}`,
+          `${API_BASE}api/documents/${editingDoc._id}`,
           formData,
           config
         );
@@ -185,7 +185,7 @@ export default function AdminPublishedDocuments() {
       } else {
         // Create new document
         const result = await axios.post(
-          `${API_BASE}/api/documents`,
+          `${API_BASE}api/documents`,
           formData,
           config
         );
@@ -223,7 +223,7 @@ export default function AdminPublishedDocuments() {
         headers: { 'Authorization': `Bearer ${token}` }
       };
 
-      const result = await axios.delete(`${API_BASE}/api/documents/${id}`, config);
+      const result = await axios.delete(`${API_BASE}api/documents/${id}`, config);
       
       if (result.data.success) {
         // Remove from local state

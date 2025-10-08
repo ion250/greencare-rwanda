@@ -46,7 +46,7 @@ export default function AddArticle() {
         formData.append('image', image)
       }
 
-      await axios.post(`${API_BASE}/api/articles`, formData, {
+      await axios.post(`${API_BASE}api/articles`, formData, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
           'Content-Type': 'multipart/form-data'

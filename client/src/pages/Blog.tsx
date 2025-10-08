@@ -52,7 +52,7 @@ export default function Blog() {
         const config = token ? { headers: { Authorization: token } } : {};
 
         // Fetch articles
-        const articleRes = await axios.get(`${API_BASE}/api/articles`, config);
+        const articleRes = await axios.get(`${API_BASE}api/articles`, config);
         const formattedArticles = articleRes.data.map((article: Article) => ({
           ...article,
           image: article.image
@@ -64,7 +64,7 @@ export default function Blog() {
         setArticles(formattedArticles);
 
         // Fetch published documents
-        const docRes = await axios.get(`${API_BASE}/api/documents`);
+        const docRes = await axios.get(`${API_BASE}api/documents`);
         const sortedDocs = docRes.data.documents.sort(
           (a: PublishedDocument, b: PublishedDocument) =>
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()

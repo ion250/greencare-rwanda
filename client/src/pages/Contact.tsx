@@ -59,7 +59,7 @@ export default function Contact() {
       setLoading(true);
       
       try {
-        const response = await axios.post(`${API_BASE}/api/messages`, {
+        const response = await axios.post(`${API_BASE}api/messages`, {
           name,
           email,
           phone,

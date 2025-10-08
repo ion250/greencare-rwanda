@@ -46,7 +46,7 @@ export default function ProductManagement() {
         return;
       }
 
-      const response = await axios.get(`${API_BASE}/api/products`, {
+      const response = await axios.get(`${API_BASE}api/products`, {
         headers: {
           'Authorization': token
         }
@@ -123,7 +123,7 @@ export default function ProductManagement() {
 
       if (!editingProduct) {
         // Create new product
-        await axios.post(`${API_BASE}/api/products`, formDataToSend, {
+        await axios.post(`${API_BASE}api/products`, formDataToSend, {
           headers: {
             'Authorization': token,
             'Content-Type': 'multipart/form-data'
@@ -131,7 +131,7 @@ export default function ProductManagement() {
         });
       } else {
         // Update existing product
-        await axios.put(`${API_BASE}/api/products/${editingProduct._id}`, formDataToSend, {
+        await axios.put(`${API_BASE}api/products/${editingProduct._id}`, formDataToSend, {
           headers: {
             'Authorization': token,
             'Content-Type': 'multipart/form-data'
@@ -178,7 +178,7 @@ export default function ProductManagement() {
 
     try {
       const token = localStorage.getItem('authToken');
-      await axios.delete(`${API_BASE}/api/products/${productId}`, {
+      await axios.delete(`${API_BASE}api/products/${productId}`, {
         headers: {
           'Authorization': token
         }

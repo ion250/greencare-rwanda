@@ -43,7 +43,7 @@ export default function PartnerManagement() {
         return;
       }
 
-      const response = await axios.get(`${API_BASE}/api/partners`, {
+      const response = await axios.get(`${API_BASE}api/partners`, {
         headers: {
           'Authorization': token
         }

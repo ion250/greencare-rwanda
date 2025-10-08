@@ -94,7 +94,7 @@ export default function Order() {
         };
         
         // Send to API
-        const response = await axios.post(`${API_BASE}/api/orders`, orderData);
+        const response = await axios.post(`${API_BASE}api/orders`, orderData);
         
         if (response.data.success) {
           setLoading(false);

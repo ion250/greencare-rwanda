@@ -35,7 +35,7 @@ export default function MessageManagement() {
         return;
       }
 
-      const response = await axios.get(`${API_BASE}/api/messages`, {
+      const response = await axios.get(`${API_BASE}api/messages`, {
         headers: {
           'Authorization': token
         }
@@ -59,7 +59,7 @@ export default function MessageManagement() {
       
       // Removed unused response variable
       await axios.put(
-        `${API_BASE}/api/messages/${id}/read`,
+        `${API_BASE}api/messages/${id}/read`,
         {},
         {
           headers: {
@@ -88,7 +88,7 @@ export default function MessageManagement() {
       
       // Removed unused response variable
       await axios.put(
-        `${API_BASE}/api/messages/${id}/replied`,
+        `${API_BASE}api/messages/${id}/replied`,
         {},
         {
           headers: {
@@ -119,7 +119,7 @@ export default function MessageManagement() {
     try {
       const token = localStorage.getItem('authToken');
       await axios.delete(
-      `${API_BASE}/api/messages/${id}`,
+      `${API_BASE}api/messages/${id}`,
         {
           headers: {
             'Authorization': token

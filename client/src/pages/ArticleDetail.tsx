@@ -36,7 +36,7 @@ export default function ArticleDetail() {
       } : {};
 
       // Fetch the main article
-      const articleResponse = await axios.get(`${API_BASE}/api/articles/${slug}`, config)
+      const articleResponse = await axios.get(`${API_BASE}api/articles/${slug}`, config)
       
       // Format the article image URL
       const formattedArticle = {
@@ -51,7 +51,7 @@ export default function ArticleDetail() {
       setArticle(formattedArticle);
 
       // Fetch related articles (other articles from the same author)
-      const articlesResponse = await axios.get(`${API_BASE}/api/articles`, config)
+      const articlesResponse = await axios.get(`${API_BASE}api/articles`, config)
       
       // Format image URLs for related articles
       const formattedArticles = articlesResponse.data

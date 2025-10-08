@@ -159,7 +159,7 @@ const heroImages = [
     try {
       setLoading(true);
       setError("");
-      const res = await axios.get<Article[]>(`${API_BASE}/api/articles?limit=3`);
+      const res = await axios.get<Article[]>(`${API_BASE}api/articles?limit=3`);
       setArticles(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error("Error fetching articles:", err);
@@ -172,7 +172,7 @@ const heroImages = [
 
   const fetchTestimonials = async () => {
     try {
-      const res = await axios.get<Testimonial[]>(`${API_BASE}/api/testimonials`);
+      const res = await axios.get<Testimonial[]>(`${API_BASE}api/testimonials`);
       setTestimonials(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error("Error fetching testimonials:", err);
@@ -182,7 +182,7 @@ const heroImages = [
 
   const fetchPartners = async () => {
     try {
-      const res = await axios.get<Partner[]>(`${API_BASE}/api/partners`);
+      const res = await axios.get<Partner[]>(`${API_BASE}api/partners`);
       setPartners(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error("Error fetching partners:", err);
