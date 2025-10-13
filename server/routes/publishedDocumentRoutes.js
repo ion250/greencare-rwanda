@@ -12,7 +12,7 @@ if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-// Multer setup with enhanced configuration
+// Multer setup
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, uploadDir);
@@ -24,27 +24,24 @@ const storage = multer.diskStorage({
   }
 });
 
-// File filter for PDF files only
 const fileFilter = (req, file, cb) => {
-  const allowedTypes = ['application/pdf'];
-  if (allowedTypes.includes(file.mimetype)) {
+  if (file.mimetype === 'application/pdf') {
     cb(null, true);
   } else {
     cb(new Error('Only PDF files are allowed'));
   }
 };
 
-// Multer instance with limits and file filter
 const upload = multer({
   storage: storage,
   fileFilter: fileFilter,
   limits: {
-    fileSize: 10 * 1024 * 1024, // 10MB limit
+    fileSize: 10 * 1024 * 1024, // 10MB
     files: 1
   }
 });
 
-// Error handling middleware for multer
+// Multer error handler
 const multerErrorHandler = (error, req, res, next) => {
   if (error instanceof multer.MulterError) {
     if (error.code === 'LIMIT_FILE_SIZE') {
@@ -66,32 +63,53 @@ const multerErrorHandler = (error, req, res, next) => {
   next(error);
 };
 
-// GET all documents with pagination
+// GET all documents — ✅ FIXED: fetch more by default for admin
 router.get("/", async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const skip = (page - 1) * limit;
+    let { page, limit } = req.query;
+
+    // Default: fetch up to 50 documents (good for admin panels)
+    // Allow 'all' to fetch up to 1000 (safe cap)
+    let parsedLimit = this.all;
+    let parsedPage = 1;
+
+    if (limit === 'all') {
+      parsedLimit = 1000; // Safe upper bound
+    } else if (limit) {
+      const numLimit = parseInt(limit, 10);
+      if (!isNaN(numLimit) && numLimit > 0) {
+        parsedLimit = Math.min(numLimit, 100); // Max 100 if not 'all'
+      }
+    }
+
+    if (page) {
+      const numPage = parseInt(page, 10);
+      if (!isNaN(numPage) && numPage > 0) {
+        parsedPage = numPage;
+      }
+    }
+
+    const skip = (parsedPage - 1) * parsedLimit;
 
     const totalDocuments = await PublishedDocument.countDocuments();
     const documents = await PublishedDocument.find()
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(limit);
+      .limit(parsedLimit);
 
     res.json({ 
       success: true, 
       documents,
       pagination: {
-        currentPage: page,
-        totalPages: Math.ceil(totalDocuments / limit),
+        currentPage: parsedPage,
+        totalPages: Math.ceil(totalDocuments / parsedLimit),
         totalDocuments,
-        hasNextPage: page < Math.ceil(totalDocuments / limit),
-        hasPrevPage: page > 1
+        hasNextPage: parsedPage < Math.ceil(totalDocuments / parsedLimit),
+        hasPrevPage: parsedPage > 1
       }
     });
   } catch (err) {
-    console.error("GET error:", err);
+    console.error("GET documents error:", err);
     res.status(500).json({ success: false, message: "Server error" });
   }
 });
@@ -108,7 +126,6 @@ router.get("/:id", async (req, res) => {
       });
     }
     
-    // Increment download count when document is accessed
     if (req.query.incrementDownload) {
       document.downloadCount += 1;
       await document.save();
@@ -132,7 +149,6 @@ router.post("/", upload.single("file"), async (req, res, next) => {
   try {
     const { title, description } = req.body;
     
-    // Validate required fields
     if (!title || !title.trim()) {
       return res.status(400).json({ 
         success: false, 
@@ -154,7 +170,6 @@ router.post("/", upload.single("file"), async (req, res, next) => {
       });
     }
 
-    // Get user from request (assuming auth middleware sets req.user)
     const uploadedBy = req.user ? req.user._id : null;
 
     const newDoc = new PublishedDocument({
@@ -170,15 +185,12 @@ router.post("/", upload.single("file"), async (req, res, next) => {
     const savedDoc = await newDoc.save();
     res.status(201).json({ success: true, document: savedDoc });
   } catch (err) {
-    // Clean up uploaded file if document creation fails
+    // Cleanup file on error
     if (req.file && req.file.path) {
-      try {
-        fs.unlinkSync(req.file.path);
-      } catch (unlinkErr) {
-        console.error('Failed to cleanup uploaded file:', unlinkErr);
-      }
+      fs.unlink(req.file.path, (unlinkErr) => {
+        if (unlinkErr) console.error('Cleanup failed:', unlinkErr);
+      });
     }
-    
     console.error("POST error:", err);
     res.status(500).json({ success: false, message: "Server error" });
   }
@@ -198,28 +210,21 @@ router.put("/:id", upload.single("file"), async (req, res, next) => {
 
     const updateData = { ...req.body };
 
-    // Handle file update
     if (req.file) {
-      // Remove old file
+      // Delete old file
       if (document.fileUrl) {
         const oldFilePath = path.join(__dirname, '..', document.fileUrl);
-        try {
-          if (fs.existsSync(oldFilePath)) {
-            fs.unlinkSync(oldFilePath);
-          }
-        } catch (err) {
-          console.error('Failed to delete old file:', err);
+        if (fs.existsSync(oldFilePath)) {
+          fs.unlinkSync(oldFilePath);
         }
       }
 
-      // Update file information
       updateData.fileUrl = `/uploads/documents/${req.file.filename}`;
       updateData.fileName = req.file.originalname;
       updateData.fileSize = req.file.size;
       updateData.fileType = req.file.mimetype;
     }
 
-    // Update other fields
     if (updateData.title) updateData.title = updateData.title.trim();
     if (updateData.description) updateData.description = updateData.description.trim();
 
@@ -231,13 +236,11 @@ router.put("/:id", upload.single("file"), async (req, res, next) => {
 
     res.json({ success: true, document: updatedDoc });
   } catch (err) {
-    // Clean up newly uploaded file if update fails
+    // Cleanup new file on error
     if (req.file && req.file.path) {
-      try {
-        fs.unlinkSync(req.file.path);
-      } catch (unlinkErr) {
-        console.error('Failed to cleanup uploaded file:', unlinkErr);
-      }
+      fs.unlink(req.file.path, (unlinkErr) => {
+        if (unlinkErr) console.error('Cleanup failed:', unlinkErr);
+      });
     }
     
     if (err.name === 'CastError') {
@@ -264,16 +267,10 @@ router.delete("/:id", async (req, res) => {
       });
     }
 
-    // Remove file from filesystem
     if (document.fileUrl) {
       const filePath = path.join(__dirname, '..', document.fileUrl);
-      try {
-        if (fs.existsSync(filePath)) {
-          fs.unlinkSync(filePath);
-        }
-      } catch (err) {
-        console.error('Failed to delete file:', err);
-        // Continue with deletion even if file deletion fails
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
       }
     }
 

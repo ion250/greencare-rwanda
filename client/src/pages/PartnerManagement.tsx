@@ -116,7 +116,7 @@ export default function PartnerManagement() {
       if (isEditing && selectedPartner) {
         // Update existing partner
         const response = await axios.put(
-          `http://localhost:5000/api/partners/${selectedPartner._id}`,
+          `${API_BASE}api/partners/${selectedPartner._id}`,
           formData,
           config
         );
@@ -125,7 +125,7 @@ export default function PartnerManagement() {
       } else {
         // Create new partner
         const response = await axios.post(
-          'http://localhost:5000/api/partners',
+          `${API_BASE}api/partners`,
           formData,
           config
         );
@@ -147,7 +147,7 @@ export default function PartnerManagement() {
     try {
       const token = localStorage.getItem('authToken');
       await axios.delete(
-        `http://localhost:5000/api/partners/${id}`,
+        `${API_BASE}api/partners/${id}`,
         {
           headers: {
             'Authorization': token

@@ -1,10 +1,11 @@
-// src/pages/ArticleManagement.tsx
 import DashboardLayout from '../components/DashboardLayout';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Editor } from '@tinymce/tinymce-react';
+
 const API_BASE = import.meta.env.VITE_API_BASE;
+
 interface Article {
   _id: string;
   title: string;
@@ -32,7 +33,7 @@ export default function ArticleManagement() {
   const [error, setError] = useState('');
   const [showAddArticle, setShowAddArticle] = useState(false);
   const [editingArticle, setEditingArticle] = useState<Article | null>(null);
-  const [previewArticle, setPreviewArticle] = useState<Article | null>(null); // For View modal
+  const [previewArticle, setPreviewArticle] = useState<Article | null>(null);
 
   const [formData, setFormData] = useState<FormData>({
     title: '',
@@ -45,13 +46,14 @@ export default function ArticleManagement() {
 
   const navigate = useNavigate();
 
-  // Use environment variable for TinyMCE API key
-  const TINYMCE_API_KEY = import.meta.env.VITE_TINYMCE_API_KEY || '2qggg38dnagje3dzy0p5yu86ltw6jgkt4dkyoqvpo7eet8te';
+  const TINYMCE_API_KEY =
+    import.meta.env.VITE_TINYMCE_API_KEY || '2qggg38dnagje3dzy0p5yu86ltw6jgkt4dkyoqvpo7eet8te';
 
   useEffect(() => {
     fetchArticles();
   }, []);
 
+  // ✅ Fixed Image URL Handling
   const fetchArticles = async () => {
     try {
       setLoading(true);
@@ -68,15 +70,18 @@ export default function ArticleManagement() {
 
       const formatted = res.data.map((a: Article) => ({
         ...a,
-        image: a.image && !a.image.startsWith('http')
-          ? `${API_BASE}${a.image}`
-          : a.image
+        image: a.image
+          ? a.image.startsWith('http')
+            ? a.image
+            : `${API_BASE.replace(/\/$/, '')}/${a.image.replace(/^\/+/, '')}`
+          : ''
       }));
 
       setArticles(formatted);
     } catch (err: any) {
       if (err.response?.status === 401) navigate('/login');
-      else if (err.response?.status === 403) setError('Access denied. Admin privileges required.');
+      else if (err.response?.status === 403)
+        setError('Access denied. Admin privileges required.');
       else setError('Failed to load articles.');
     } finally {
       setLoading(false);
@@ -84,22 +89,10 @@ export default function ArticleManagement() {
   };
 
   const validateForm = (): boolean => {
-    if (!formData.title.trim()) {
-      setError('Title is required');
-      return false;
-    }
-    if (!formData.description.trim()) {
-      setError('Description is required');
-      return false;
-    }
-    if (!formData.content.trim()) {
-      setError('Content is required');
-      return false;
-    }
-    if (!formData.author.trim()) {
-      setError('Author is required');
-      return false;
-    }
+    if (!formData.title.trim()) return setError('Title is required'), false;
+    if (!formData.description.trim()) return setError('Description is required'), false;
+    if (!formData.content.trim()) return setError('Content is required'), false;
+    if (!formData.author.trim()) return setError('Author is required'), false;
     return true;
   };
 
@@ -129,7 +122,7 @@ export default function ArticleManagement() {
       setFormData({ title: '', description: '', content: '', author: '', image: null, imageUrl: '' });
       setShowAddArticle(false);
       setEditingArticle(null);
-      fetchArticles(); // Refresh list
+      fetchArticles();
     } catch (err: any) {
       console.error('Error saving article:', err);
       setError(err.response?.data?.message || 'Failed to save article.');
@@ -156,7 +149,7 @@ export default function ArticleManagement() {
       await axios.delete(`${API_BASE}api/articles/${_id}`, {
         headers: { Authorization: token! }
       });
-      setArticles(articles.filter(a => a._id !== _id));
+      setArticles(articles.filter((a) => a._id !== _id));
     } catch {
       setError('Failed to delete article');
     }
@@ -209,14 +202,8 @@ export default function ArticleManagement() {
             </button>
           </div>
 
-          {/* Error Alert */}
-          {error && (
-            <div className="mb-6 p-4 bg-red-100 text-red-700 rounded-md">
-              {error}
-            </div>
-          )}
+          {error && <div className="mb-6 p-4 bg-red-100 text-red-700 rounded-md">{error}</div>}
 
-          {/* Responsive Table */}
           <div className="overflow-x-auto border border-gray-200 rounded-lg shadow-sm">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
@@ -248,10 +235,7 @@ export default function ArticleManagement() {
                 ) : (
                   articles.map((article) => (
                     <tr key={article._id} className="hover:bg-gray-50">
-                      <td
-                        className="px-4 py-4 text-sm font-medium text-gray-900 line-clamp-2 break-words max-w-60"
-                        title={article.title}
-                      >
+                      <td className="px-4 py-4 text-sm font-medium text-gray-900 line-clamp-2 break-words max-w-60" title={article.title}>
                         {article.title}
                       </td>
                       <td className="px-4 py-4 text-sm text-gray-500">{article.author}</td>
@@ -443,31 +427,45 @@ function AddEditArticleModal({
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Content *</label>
             <Editor
-  apiKey={tinymceApiKey}
-  value={formData.content}
-  onEditorChange={(content: string) => // ← Add :string here
-    onChange((prev) => ({ ...prev, content }))
-  }
-  init={{
-    height: 400,
-    menubar: true,
-    plugins: [
-      'advlist', 'autolink', 'lists', 'link', 'image', 'charmap',
-      'print', 'preview', 'anchor', 'searchreplace', 'visualblocks',
-      'code', 'fullscreen', 'insertdatetime', 'media', 'table',
-      'paste', 'help', 'wordcount'
-    ],
-    toolbar: `
-      undo redo | formatselect | bold italic backcolor |
-      alignleft aligncenter alignright alignjustify |
-      bullist numlist outdent indent |
-      link image media table | code fullscreen | help
-    `,
-    branding: false,
-    statusbar: true
-  }}
-/>
-            
+              apiKey={tinymceApiKey}
+              value={formData.content}
+              onEditorChange={(content: string) =>
+                onChange((prev) => ({ ...prev, content }))
+              }
+              init={{
+                height: 400,
+                menubar: true,
+                plugins: [
+                  'advlist',
+                  'autolink',
+                  'lists',
+                  'link',
+                  'image',
+                  'charmap',
+                  'print',
+                  'preview',
+                  'anchor',
+                  'searchreplace',
+                  'visualblocks',
+                  'code',
+                  'fullscreen',
+                  'insertdatetime',
+                  'media',
+                  'table',
+                  'paste',
+                  'help',
+                  'wordcount'
+                ],
+                toolbar: `
+                  undo redo | formatselect | bold italic backcolor |
+                  alignleft aligncenter alignright alignjustify |
+                  bullist numlist outdent indent |
+                  link image media table | code fullscreen | help
+                `,
+                branding: false,
+                statusbar: true
+              }}
+            />
           </div>
 
           <div>
@@ -486,56 +484,47 @@ function AddEditArticleModal({
                 </div>
               ) : (
                 <div>
-                  <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                   <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
-                  <div className="flex text-sm text-gray-600 justify-center mt-2">
-                    <label className="cursor-pointer bg-white rounded-md font-medium text-green-600 hover:text-green-500">
-                      Upload an image
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) {
-                            if (!file.type.startsWith('image/')) {
-                              alert('Images only!');
-                              return;
-                            }
-                            if (file.size > 10 * 1024 * 1024) {
-                              alert('Image must be under 10MB.');
-                              return;
-                            }
-                            onChange((prev) => ({
-                              ...prev,
-                              image: file,
-                              imageUrl: URL.createObjectURL(file)
-                            }));
-                          }
-                        }}
-                        className="sr-only"
-                      />
-                    </label>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1">PNG, JPG, GIF up to 10MB</p>
+                  <label
+                    htmlFor="file-upload"
+                    className="mt-2 block text-bold text-sm text-gray-600 font-medium text-green-600 hover:text-green-500"
+                  >
+                    Upload an image
+                  </label>
+                  <input
+                    id="file-upload"
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        onChange((prev) => ({
+                          ...prev,
+                          image: file,
+                          imageUrl: URL.createObjectURL(file)
+                        }));
+                      }
+                    }}
+                    className="hidden"
+                  />
                 </div>
-              )}
+                
+              )} <p className="text-xs text-gray-500 mt-1">PNG, JPG, GIF up to 10MB</p>
+
             </div>
           </div>
 
-          <div className="flex justify-end space-x-3 pt-4">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-            >
+          <div className="flex justify-end gap-4 pt-4 border-t border-gray-200">
+            <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-500 text-white rounded-md">
               Cancel
             </button>
             <button
               type="submit"
               className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
             >
-              {editing ? 'Update' : 'Create'} Article
+              {editing ? 'Update Article' : 'Create Article'}
             </button>
           </div>
         </form>

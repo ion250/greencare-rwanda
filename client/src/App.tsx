@@ -6,7 +6,7 @@ import About from './pages/About'
 import Products from './pages/Products'
 import Services from './pages/Services'
 import Blog from './pages/Blog'
-import Ourteam from './pages/Ourteam'
+import Team from './pages/Ourteam'
 import ArticleDetail from './pages/ArticleDetail'
 import Contact from './pages/Contact'
 import Login from './pages/Login'
@@ -17,7 +17,7 @@ import ProductManagement from './pages/ProductManagement'
 import ProtectedRoute from './components/ProtectedRoute'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import Order from './pages/Order'
-import OrderManagement from './pages/OrderManagement'
+import OrderManagement from './pages/ManagementOrder'
 import MessageManagement from './pages/MessageManagement'
 import PartnerManagement from './pages/PartnerManagement'
 import AdminPublishedDocuments from './components/AdminPublishedDocuments'
@@ -36,7 +36,7 @@ function App() {
             <Route path="/services" element={<Services />} />
             <Route path="/order" element={<Order />} />
             <Route path="/blog" element={<Blog />} />
-            <Route path="/ourteam" element={<Ourteam/>} />
+            <Route path="/ourteam" element={<Team/>} />
             <Route path="/blog/:slug" element={<ArticleDetail />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/login" element={<Login />} />
@@ -52,6 +52,7 @@ function App() {
               <Route path="/dashboard/partners" element={<PartnerManagement/>} />
               <Route path="/dashboard/testimonials" element={<TestimonialManagement/>} />
               <Route path="/dashboard/docs" element={<AdminPublishedDocuments/>} />
+              
 
               </Route>
           </Routes>

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
-const API_BASE = import.meta.env.VITE_API_BASE;
+const API_BASE = import.meta.env.VITE_API_BASE?.replace(/\/$/, '') + '/';
 // Types
 interface Article {
   _id: string;
@@ -400,70 +400,89 @@ const heroImages = [
       </section>
 
       {/* Latest Articles */}
-      <section className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-green-800 text-center mb-8">Latest Articles</h2>
-          <p className="text-center text-gray-700 text-lg max-w-2xl mx-auto mb-12">
-            Stay informed about sustainability practices, waste management innovations, and the benefits of composting.
-          </p>
+<section className="py-16 bg-gray-50">
+  <div className="container mx-auto px-4">
+    {/* Section Header */}
+    <h2 className="text-3xl md:text-4xl font-bold text-green-800 text-center mb-8">
+      Latest Articles
+    </h2>
+    <p className="text-center text-gray-700 text-lg max-w-2xl mx-auto mb-12">
+      Stay informed about sustainability practices, waste management innovations, 
+      and the benefits of composting.
+    </p>
 
-          {error && (
-            <div className="bg-red-100 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-6 text-center">
-              {error}
-            </div>
-          )}
+    {/* Error Handling */}
+    {error && (
+      <div className="bg-red-100 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-6 text-center">
+        {error}
+      </div>
+    )}
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {articles.length > 0 ? (
-              articles.slice(0, 3).map((article) => {
-                const imageUrl = article.image?.startsWith('http')
-                  ? article.image
-                  : `${API_BASE}${article.image}`;
-                return (
-                  <article key={article._id} className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col">
-                    <img
-                      src={imageUrl}
-                      alt={article.title}
-                      className="w-full h-48 object-cover"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = '/images/placeholder.jpg'; // ← Changed path
-                      }}
-                    />
-                    <div className="p-6 flex-grow">
-                      <div className="flex items-center text-sm text-gray-500 mb-2">
-                        <span>{article.author}</span>
-                        <span className="mx-2">•</span>
-                        <span>{new Date(article.createdAt).toLocaleDateString()}</span>
-                      </div>
-                      <h3 className="text-xl font-bold text-green-800 mb-3 line-clamp-2">{article.title}</h3>
-                      <p className="text-gray-700 mb-4 line-clamp-3">{article.description}</p>
-                      <Link
-                        to={`/blog/${article.slug}`}
-                        className="text-green-600 font-semibold hover:text-green-800 transition-colors inline-flex items-center"
-                      >
-                        Read More →
-                      </Link>
-                    </div>
-                  </article>
-                );
-              })
-            ) : (
-              <div className="col-span-3 text-center py-8">
-                <p className="text-gray-700">No articles available at the moment.</p>
-              </div>
-            )}
-          </div>
+    {/* Articles Grid */}
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      {articles.length > 0 ? (
+        articles.slice(0, 3).map((article) => {
+          // ✅ Ensure correct image path for both local and remote images
+          const imageUrl = article.image?.startsWith("http")
+            ? article.image
+            : `${API_BASE.replace(/\/api\/?$/, "")}${
+                article.image.startsWith("/") ? article.image : `/${article.image}`
+              }`;
 
-          <div className="text-center mt-12">
-            <Link
-              to="/blog"
-              className="bg-green-600 text-white px-8 py-3 rounded-md hover:bg-green-700 transition-colors inline-block"
+          return (
+            <article
+              key={article._id}
+              className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col hover:shadow-lg transition-shadow"
             >
-              View All Articles
-            </Link>
-          </div>
+              <img
+                src={imageUrl}
+                alt={article.title}
+                className="w-full h-48 object-cover"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = "/images/placeholder.jpg";
+                }}
+              />
+              <div className="p-6 flex-grow">
+                <div className="flex items-center text-sm text-gray-500 mb-2">
+                  <span>{article.author || "GreenCare Team"}</span>
+                  <span className="mx-2">•</span>
+                  <span>{new Date(article.createdAt).toLocaleDateString()}</span>
+                </div>
+                <h3 className="text-xl font-bold text-green-800 mb-3 line-clamp-2">
+                  {article.title}
+                </h3>
+                <p className="text-gray-700 mb-4 line-clamp-3">
+                  {article.description}
+                </p>
+                <Link
+                  to={`/blog/${article.slug}`}
+                  className="text-green-600 font-semibold hover:text-green-800 transition-colors inline-flex items-center"
+                >
+                  Read More →
+                </Link>
+              </div>
+            </article>
+          );
+        })
+      ) : (
+        <div className="col-span-3 text-center py-8">
+          <p className="text-gray-700">No articles available at the moment.</p>
         </div>
-      </section>
+      )}
+    </div>
+
+    {/* View All Button */}
+    <div className="text-center mt-12">
+      <Link
+        to="/blog"
+        className="bg-green-600 text-white px-8 py-3 rounded-md hover:bg-green-700 transition-colors inline-block"
+      >
+        View All Articles
+      </Link>
+    </div>
+  </div>
+</section>
+
 
       {/* Testimonials */}
       <section id="testimonials" className="py-16 bg-white">
@@ -612,4 +631,4 @@ const heroImages = [
       )}
     </div>
   );
-}
+} 

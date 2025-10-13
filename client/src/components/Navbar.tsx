@@ -26,7 +26,7 @@ export default function Navbar() {
           <div className="flex items-center">
             <Link to="/" className="flex-shrink-0 flex items-center">
               <img 
-                src="./src/images/g-logo.svg" 
+                src="./src/images/g-logo.png" 
                 alt="GreenCare Rwanda Logo" 
                 className="h-[80px] w-auto"
               />

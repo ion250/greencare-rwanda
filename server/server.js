@@ -17,9 +17,6 @@ const publishedDocumentRoutes = require('./routes/publishedDocumentRoutes');
 
 
 
-
-
-
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -30,6 +27,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Serve static files - Make sure this is correct
 app.use('/uploads', express.static('uploads'));
+
 
 // API routes
 app.use('/api/auth', authRoutes);

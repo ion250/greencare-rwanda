@@ -17,7 +17,7 @@ router.get('/', authenticate, async (req, res) => {
     const users = await User.find().select('-password').sort({ createdAt: -1 });
     res.json(users);
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server errors' });
   }
 });
 
@@ -27,7 +27,7 @@ router.get('/count', authenticate, async (req, res) => {
     const count = await User.countDocuments();
     res.json({ count });
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server errorr' });
   }
 });
 
@@ -47,7 +47,7 @@ router.get('/:id', authenticate, async (req, res) => {
     }
     res.json(user);
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server errora' });
   }
 });
 
@@ -86,7 +86,7 @@ router.post('/', authenticate, async (req, res) => {
     await user.save();
     res.status(201).json(user);
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server errores' });
   }
 });
 
@@ -149,7 +149,7 @@ router.delete('/:id', authenticate, async (req, res) => {
 
     res.json({ message: 'User deleted successfully' });
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error3' });
   }
 });
 
