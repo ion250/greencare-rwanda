@@ -1,3 +1,4 @@
+// src/pages/Blog.tsx
 import { useState, useEffect } from "react";
 import axios from "axios";
 
@@ -220,14 +221,20 @@ export default function Blog() {
                   <div key={doc._id} className="mb-5 pb-5 border-b last:border-none">
                     <h3 className="font-semibold text-gray-800 mb-2">{doc.title}</h3>
                     <p className="text-gray-600 text-sm line-clamp-2 mb-2">{doc.description}</p>
-                    <a
-                      href={cleanUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 text-sm hover:underline"
+                    {/* ✅ CHANGED: Download in new tab */}
+                    <button
+                      onClick={() => {
+                        const newTab = window.open(cleanUrl, '_blank');
+                        if (newTab) {
+                          newTab.focus();
+                        } else {
+                          alert('Please allow popups to download the document.');
+                        }
+                      }}
+                      className="text-blue-600 text-sm hover:underline text-left"
                     >
-                      📄 View PDF
-                    </a>
+                      📄 Download PDF
+                    </button>
                     <p className="text-xs text-gray-400 mt-1">
                       {new Date(doc.createdAt).toLocaleDateString()}
                     </p>

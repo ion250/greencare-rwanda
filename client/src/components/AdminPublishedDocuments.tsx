@@ -165,29 +165,28 @@ export default function AdminPublishedDocuments() {
         }
       };
 
-     if (editingDoc) {
-  const res = await axios.put(`${API_BASE}api/documents/${editingDoc._id}`, formData, config);
-  if (res.data.success) {
-    setDocuments((prev: PublishedDocument[]) =>
-      prev.map((doc) => (doc._id === editingDoc._id ? res.data.updatedDocument : doc))
-    );
-  } else {
-    setError(res.data.message || 'Update failed');
-    return;
-  }
-} else {
-  const res = await axios.post(`${API_BASE}api/documents`, formData, config);
-  if (res.data.success) {
-    setDocuments((prev: PublishedDocument[]) => [
-      res.data.document,
-      ...prev.filter((d: PublishedDocument) => d._id !== res.data.document._id)
-    ]);
-  } else {
-    setError(res.data.message || 'Creation failed');
-    return;
-  }
-}
-
+      if (editingDoc) {
+        const res = await axios.put(`${API_BASE}api/documents/${editingDoc._id}`, formData, config);
+        if (res.data.success) {
+          setDocuments((prev: PublishedDocument[]) =>
+            prev.map((doc) => (doc._id === editingDoc._id ? res.data.updatedDocument : doc))
+          );
+        } else {
+          setError(res.data.message || 'Update failed');
+          return;
+        }
+      } else {
+        const res = await axios.post(`${API_BASE}api/documents`, formData, config);
+        if (res.data.success) {
+          setDocuments((prev: PublishedDocument[]) => [
+            res.data.document,
+            ...prev.filter((d: PublishedDocument) => d._id !== res.data.document._id)
+          ]);
+        } else {
+          setError(res.data.message || 'Creation failed');
+          return;
+        }
+      }
 
       fetchDocuments(); // Refresh list
       closeModal();
@@ -220,6 +219,12 @@ export default function AdminPublishedDocuments() {
     if (!fileUrl) return '';
     if (fileUrl.startsWith('http')) return fileUrl;
     return `${API_BASE}${fileUrl.replace(/^\//, '')}`;
+  };
+
+  // ✅ OPEN IN NEW TAB INSTEAD OF DOWNLOAD
+  const handleOpenInNewTab = (doc: PublishedDocument) => {
+    const url = getFullFileUrl(doc.fileUrl);
+    window.open(url, '_blank', 'noopener,noreferrer');
   };
 
   return (
@@ -338,14 +343,13 @@ export default function AdminPublishedDocuments() {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <div className="flex justify-end space-x-2">
-                              <a
-                                href={getFullFileUrl(doc.fileUrl)}
-                                target="_blank"
-                                rel="noopener noreferrer"
+                              {/* ✅ OPEN IN NEW TAB */}
+                              <button
+                                onClick={() => handleOpenInNewTab(doc)}
                                 className="text-green-600 hover:text-green-900 px-3 py-1 rounded hover:bg-green-50"
                               >
-                                View
-                              </a>
+                                Open in New Tab
+                              </button>
                               <button
                                 onClick={() => openModal(doc)}
                                 className="text-blue-600 hover:text-blue-900 px-3 py-1 rounded hover:bg-blue-50"
