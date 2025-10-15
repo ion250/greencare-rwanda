@@ -2,7 +2,6 @@ import DashboardLayout from '../components/DashboardLayout';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Editor } from '@tinymce/tinymce-react';
 
 const API_BASE = import.meta.env.VITE_API_BASE;
 
@@ -45,9 +44,6 @@ export default function ArticleManagement() {
   });
 
   const navigate = useNavigate();
-
-  const TINYMCE_API_KEY =
-    import.meta.env.VITE_TINYMCE_API_KEY || '2qggg38dnagje3dzy0p5yu86ltw6jgkt4dkyoqvpo7eet8te';
 
   useEffect(() => {
     fetchArticles();
@@ -296,7 +292,6 @@ export default function ArticleManagement() {
             setShowAddArticle(false);
             setEditingArticle(null);
           }}
-          tinymceApiKey={TINYMCE_API_KEY}
         />
       )}
 
@@ -326,10 +321,9 @@ export default function ArticleManagement() {
                 />
               )}
               <p className="text-gray-700">{previewArticle.description}</p>
-              <div
-                className="prose max-w-none"
-                dangerouslySetInnerHTML={{ __html: previewArticle.content }}
-              />
+              <div className="prose max-w-none whitespace-pre-line">
+                {previewArticle.content}
+              </div>
             </div>
 
             <div className="p-6 border-t border-gray-200 text-right">
@@ -347,21 +341,19 @@ export default function ArticleManagement() {
   );
 }
 
-// --- Add/Edit Modal Component ---
+// --- Add/Edit Modal Component (WITHOUT TinyMCE) ---
 function AddEditArticleModal({
   editing,
   formData,
   onChange,
   onSubmit,
-  onClose,
-  tinymceApiKey
+  onClose
 }: {
   editing: boolean;
   formData: FormData;
   onChange: React.Dispatch<React.SetStateAction<FormData>>;
   onSubmit: (e: React.FormEvent) => void;
   onClose: () => void;
-  tinymceApiKey: string;
 }) {
   const removeImage = () => {
     onChange((prev) => ({ ...prev, image: null, imageUrl: '' }));
@@ -424,48 +416,22 @@ function AddEditArticleModal({
             />
           </div>
 
+          {/* ✅ REPLACED TinyMCE with simple textarea */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Content *</label>
-            <Editor
-              apiKey={tinymceApiKey}
+            <textarea
               value={formData.content}
-              onEditorChange={(content: string) =>
-                onChange((prev) => ({ ...prev, content }))
+              onChange={(e) =>
+                onChange((prev) => ({ ...prev, content: e.target.value }))
               }
-              init={{
-                height: 400,
-                menubar: true,
-                plugins: [
-                  'advlist',
-                  'autolink',
-                  'lists',
-                  'link',
-                  'image',
-                  'charmap',
-                  'print',
-                  'preview',
-                  'anchor',
-                  'searchreplace',
-                  'visualblocks',
-                  'code',
-                  'fullscreen',
-                  'insertdatetime',
-                  'media',
-                  'table',
-                  'paste',
-                  'help',
-                  'wordcount'
-                ],
-                toolbar: `
-                  undo redo | formatselect | bold italic backcolor |
-                  alignleft aligncenter alignright alignjustify |
-                  bullist numlist outdent indent |
-                  link image media table | code fullscreen | help
-                `,
-                branding: false,
-                statusbar: true
-              }}
+              rows={12}
+              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 font-mono text-sm"
+              placeholder="Write your article content here..."
+              required
             />
+            <p className="text-xs text-gray-500 mt-1">
+              Plain text only. Use line breaks for paragraphs.
+            </p>
           </div>
 
           <div>
@@ -484,7 +450,7 @@ function AddEditArticleModal({
                 </div>
               ) : (
                 <div>
-                   <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
                   <label
@@ -510,9 +476,8 @@ function AddEditArticleModal({
                     className="hidden"
                   />
                 </div>
-                
-              )} <p className="text-xs text-gray-500 mt-1">PNG, JPG, GIF up to 10MB</p>
-
+              )}
+              <p className="text-xs text-gray-500 mt-1">PNG, JPG, GIF up to 10MB</p>
             </div>
           </div>
 
