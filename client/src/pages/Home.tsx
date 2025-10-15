@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+
 const API_BASE = import.meta.env.VITE_API_BASE?.replace(/\/$/, '') + '/';
+
 // Types
 interface Article {
   _id: string;
@@ -35,8 +37,6 @@ interface Partner {
   createdAt: string;
 }
 
-
-
 export default function Home() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
@@ -54,7 +54,27 @@ export default function Home() {
   const [currentTestimonialIndex, setCurrentTestimonialIndex] = useState(0);
   const [partnerPage, setPartnerPage] = useState(0);
   const autoPlayIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const carouselRef = useRef<HTMLDivElement>(null);
+  
+
+  // Hero images list
+  const heroImages = [
+    "/images/workers.jpg",
+    "/images/workers1.png",
+    "/images/workers2.jpg",
+    "/images/workers3.png",
+    "/images/workers4.jpg",
+    "/images/workers5.jpg",
+    "/images/workers6.png",
+    "/images/workers7.jpg",
+    "/images/workers8.jpg",
+    "/images/workers9.jpg",
+    "/images/workers10.jpg",
+    "/images/workers11.jpg",
+    "/images/workers12.jpg",
+    "/images/workers13.jpg",
+    "/images/workers14.jpg",
+    "/images/workers15.png"
+  ];
 
   useEffect(() => {
     fetchLatestArticles();
@@ -65,13 +85,13 @@ export default function Home() {
       if (autoPlayIntervalRef.current) clearInterval(autoPlayIntervalRef.current);
     };
   }, []);
-   useEffect(() => {
-  const interval = setInterval(() => {
-    setCurrentHeroImageIndex((prev) => (prev + 1) % heroImages.length);
-  }, 5000); // Change image every 5 seconds
 
-  return () => clearInterval(interval);
-}, []);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentHeroImageIndex((prev) => (prev + 1) % heroImages.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     if (!loading && articles.length > 0) {
@@ -97,25 +117,6 @@ export default function Home() {
     if (autoPlayIntervalRef.current) clearInterval(autoPlayIntervalRef.current);
     startAutoPlay();
   };
-  // Hero images list
-const heroImages = [
-  "/images/workers.jpg",
-  "/images/workers1.png",
-  "/images/workers2.jpg",
-  "/images/workers3.png",
-  "/images/workers4.jpg",
-  "/images/workers5.jpg",
-  "/images/workers6.png",
-  "/images/workers7.jpg",
-  "/images/workers8.jpg",
-  "/images/workers9.jpg",
-  "/images/workers10.jpg",
-  "/images/workers11.jpg",
-  "/images/workers12.jpg",
-  "/images/workers13.jpg",
-  "/images/workers14.jpg",
-  "/images/workers15.png"
-];
 
   const handleNextTestimonial = () => {
     resetAutoPlay();
@@ -197,63 +198,55 @@ const heroImages = [
     partnerPage * ITEMS_PER_PAGE,
     (partnerPage + 1) * ITEMS_PER_PAGE
   );
- 
 
   return (
     <div className="min-h-screen bg-white pt-16">
-      {/* Hero Section with Fading Background Images */}
-<section className="bg-green-800 text-white py-24 relative overflow-hidden h-screen flex items-center">
-  {/* Background Images with Fade Effect */}
-  <div className="absolute inset-0 transition-opacity duration-1500 ease-in-out">
-    {heroImages.map((img, index) => (
-      <div
-        key={index}
-        className={`absolute inset-0 transition-opacity duration-1000 ${
-          index === currentHeroImageIndex ? 'opacity-100' : 'opacity-0'
-        }`}
-      >
-        <img
-          src={img}
-          alt={`Hero background ${index + 1}`}
-          className="w-full h-full object-cover"
-        />
-      </div>
-    ))}
-  </div>
-
-  {/* Overlay */}
-  <div className="absolute inset-0 bg-black bg-opacity-40"></div>
-
-  {/* Content */}
-  <div className="container mx-auto px-4 text-center relative z-10">
-    <h1 className="text-4xl md:text-5xl font-bold mb-4 animate-fade-in">
-      Our Environment, Our Concern
-    </h1>
-    <p className="text-lg md:text-xl opacity-90 mb-8 max-w-2xl mx-auto animate-fade-in-delay">
-      Turning bio-waste into solutions for a greener Rwanda.
-    </p>
-    <Link
-      to="/about"
-      className="bg-green-600 text-white px-8 py-3 rounded-md hover:bg-green-700 transition-colors inline-flex items-center shadow-lg hover:shadow-xl transform hover:scale-105"
-    >
-      Learn More →
-    </Link>
-  </div>
-
-  {/* Optional: Dots Indicator */}
-  <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex space-x-2 z-20">
-    {heroImages.map((_, index) => (
-      <button
-        key={index}
-        className={`w-3 h-3 rounded-full border border-white transition-all ${
-          index === currentHeroImageIndex ? 'bg-white' : 'bg-transparent'
-        }`}
-        onClick={() => setCurrentHeroImageIndex(index)}
-        aria-label={`Go to slide ${index + 1}`}
-      />
-    ))}
-  </div>
-</section>
+      {/* Hero Section */}
+      <section className="bg-green-800 text-white py-24 relative overflow-hidden h-screen flex items-center">
+        <div className="absolute inset-0 transition-opacity duration-1500 ease-in-out">
+          {heroImages.map((img, index) => (
+            <div
+              key={index}
+              className={`absolute inset-0 transition-opacity duration-1000 ${
+                index === currentHeroImageIndex ? 'opacity-100' : 'opacity-0'
+              }`}
+            >
+              <img
+                src={img}
+                alt={`Hero background ${index + 1}`}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          ))}
+        </div>
+        <div className="absolute inset-0 bg-black bg-opacity-40"></div>
+        <div className="container mx-auto px-4 text-center relative z-10">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 animate-fade-in">
+            Our Environment, Our Concern
+          </h1>
+          <p className="text-lg md:text-xl opacity-90 mb-8 max-w-2xl mx-auto animate-fade-in-delay">
+            Turning bio-waste into solutions for a greener Rwanda.
+          </p>
+          <Link
+            to="/about"
+            className="bg-green-600 text-white px-8 py-3 rounded-md hover:bg-green-700 transition-colors inline-flex items-center shadow-lg hover:shadow-xl transform hover:scale-105"
+          >
+            Learn More →
+          </Link>
+        </div>
+        <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex space-x-2 z-20">
+          {heroImages.map((_, index) => (
+            <button
+              key={index}
+              className={`w-3 h-3 rounded-full border border-white transition-all ${
+                index === currentHeroImageIndex ? 'bg-white' : 'bg-transparent'
+              }`}
+              onClick={() => setCurrentHeroImageIndex(index)}
+              aria-label={`Go to slide ${index + 1}`}
+            />
+          ))}
+        </div>
+      </section>
 
       {/* About Us */}
       <section id="about" className="py-16 bg-gray-50">
@@ -399,10 +392,9 @@ const heroImages = [
         </div>
       </section>
 
-      {/* Latest Articles */}
+   {/* Latest Articles */}
 <section className="py-16 bg-gray-50">
   <div className="container mx-auto px-4">
-    {/* Section Header */}
     <h2 className="text-3xl md:text-4xl font-bold text-green-800 text-center mb-8">
       Latest Articles
     </h2>
@@ -411,23 +403,27 @@ const heroImages = [
       and the benefits of composting.
     </p>
 
-    {/* Error Handling */}
     {error && (
       <div className="bg-red-100 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-6 text-center">
         {error}
       </div>
     )}
 
-    {/* Articles Grid */}
     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
       {articles.length > 0 ? (
         articles.slice(0, 3).map((article) => {
-          // ✅ Ensure correct image path for both local and remote images
-          const imageUrl = article.image?.startsWith("http")
-            ? article.image
-            : `${API_BASE.replace(/\/api\/?$/, "")}${
-                article.image.startsWith("/") ? article.image : `/${article.image}`
-              }`;
+          // ✅ FIXED: Proper image URL construction
+          let imageUrl = "/images/placeholder.jpg";
+          if (article.image) {
+            if (article.image.startsWith("http")) {
+              imageUrl = article.image;
+            } else {
+              // Ensure single slash between base URL and image path
+              const basePath = API_BASE.replace(/\/+$/, ""); // Remove trailing slashes
+              const imagePath = article.image.replace(/^\/+/, ""); // Remove leading slashes
+              imageUrl = `${basePath}/${imagePath}`;
+            }
+          }
 
           return (
             <article
@@ -471,7 +467,6 @@ const heroImages = [
       )}
     </div>
 
-    {/* View All Button */}
     <div className="text-center mt-12">
       <Link
         to="/blog"
@@ -483,69 +478,97 @@ const heroImages = [
   </div>
 </section>
 
+      {/* ===== WORKING TESTIMONIALS CAROUSEL ===== */}
+<section id="testimonials" className="py-16 bg-white">
+  <div className="container mx-auto px-4">
+    <div className="text-center mb-12">
+      <h2 className="text-3xl md:text-4xl font-bold text-green-800 mb-4">What People Say</h2>
+      <p className="text-gray-600 max-w-2xl mx-auto">
+        Hear from our partners, clients, and community members.
+      </p>
+    </div>
 
-      {/* Testimonials */}
-      <section id="testimonials" className="py-16 bg-white">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-green-800 mb-12">What People Say About Us</h2>
-          <div className="relative w-full overflow-hidden">
-            <div
-              ref={carouselRef}
-              className="flex transition-transform duration-700 ease-in-out"
-              style={{
-                transform: `translateX(-${currentTestimonialIndex * 33.333}%)`,
-                width: `${testimonials.length * 33.333}%`,
-              }}
-            >
-              {testimonials.map((testimonial, index) => (
-                <div key={testimonial._id} className="w-1/3 px-4 flex-shrink-0">
-                  <div className={`bg-white rounded-2xl shadow-lg p-8 min-h-[350px] flex flex-col transform transition-all duration-300 ${
-                    index === currentTestimonialIndex ? 'scale-105 shadow-2xl' : 'scale-95 opacity-80'
-                  }`}>
-                    <div className="flex items-center mb-6">
-                      <img
-                        src={testimonial.image}
-                        alt={testimonial.name}
-                        className="w-16 h-16 rounded-full object-cover border-2 border-green-600"
-                      />
-                      <div className="ml-4 text-left">
-                        <h3 className="text-lg md:text-xl font-bold text-green-800">{testimonial.name}</h3>
-                        {testimonial.position && (
-                          <p className="text-sm text-gray-600">
-                            {testimonial.position}{testimonial.company && ` at ${testimonial.company}`}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                    <p className="text-gray-700 italic mb-6 flex-grow">"{testimonial.content}"</p>
-                    <div className="flex justify-center space-x-1">
-                      {Array.from({ length: testimonial.rating }).map((_, i) => (
-                        <svg key={i} className="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.357 4.18a1 1 0 00.95.69h4.392c.969 0 1.371 1.24.588 1.81l-3.56 2.585a1 1 0 00-.364 1.118l1.358 4.18c.3.921-.755 1.688-1.54 1.118l-3.56-2.585a1 1 0 00-1.175 0l-3.56 2.585c-.784.57-1.838-.197-1.539-1.118l1.357-4.18a1 1 0 00-.364-1.118L2.76 9.607c-.783-.57-.38-1.81.588-1.81h4.392a1 1 0 00.95-.69l1.357-4.18z" />
-                        </svg>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Arrows */}
-            <button
-              onClick={handlePrevTestimonial}
-              className="absolute left-2 top-1/2 -translate-y-1/2 bg-green-600 text-white w-10 h-10 rounded-full flex items-center justify-center shadow hover:bg-green-700 z-10"
-            >
-              ‹
-            </button>
-            <button
-              onClick={handleNextTestimonial}
-              className="absolute right-2 top-1/2 -translate-y-1/2 bg-green-600 text-white w-10 h-10 rounded-full flex items-center justify-center shadow hover:bg-green-700 z-10"
-            >
-              ›
-            </button>
+    {testimonials.length > 0 ? (
+      <div className="relative max-w-4xl mx-auto">
+        {/* Single testimonial display (centered) */}
+        <div className="bg-white rounded-2xl shadow-lg p-8 text-center border border-green-100">
+          <div className="flex flex-col items-center mb-6">
+            <img
+              src={testimonials[currentTestimonialIndex]?.image || "/images/placeholder.jpg"}
+              alt={testimonials[currentTestimonialIndex]?.name || "Client"}
+              className="w-20 h-20 rounded-full object-cover border-2 border-green-500 mb-4"
+              onError={(e) => (e.target as HTMLImageElement).src = "/images/placeholder.jpg"}
+            />
+            <h3 className="font-bold text-xl text-gray-900">
+              {testimonials[currentTestimonialIndex]?.name}
+            </h3>
+            {testimonials[currentTestimonialIndex]?.position && (
+              <p className="text-green-600 mt-1">
+                {testimonials[currentTestimonialIndex]?.position}
+                {testimonials[currentTestimonialIndex]?.company && 
+                  ` • ${testimonials[currentTestimonialIndex]?.company}`}
+              </p>
+            )}
+          </div>
+          <p className="text-gray-700 italic text-lg max-w-2xl mx-auto">
+            "{testimonials[currentTestimonialIndex]?.content}"
+          </p>
+          <div className="mt-6 flex justify-center">
+            {[...Array(5)].map((_, i) => (
+              <svg
+                key={i}
+                className={`w-6 h-6 ${i < (testimonials[currentTestimonialIndex]?.rating || 0) ? 'text-yellow-400' : 'text-gray-300'}`}
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.357 4.18a1 1 0 00.95.69h4.392c.969 0 1.371 1.24.588 1.81l-3.56 2.585a1 1 0 00-.364 1.118l1.358 4.18c.3.921-.755 1.688-1.54 1.118l-3.56-2.585a1 1 0 00-1.175 0l-3.56 2.585c-.784.57-1.838-.197-1.539-1.118l1.357-4.18a1 1 0 00-.364-1.118L2.76 9.607c-.783-.57-.38-1.81.588-1.81h4.392a1 1 0 00.95-.69l1.357-4.18z" />
+              </svg>
+            ))}
           </div>
         </div>
-      </section>
+
+        {/* Navigation Dots */}
+        <div className="flex justify-center mt-8 space-x-2">
+          {testimonials.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => {
+                setCurrentTestimonialIndex(index);
+                resetAutoPlay();
+              }}
+              className={`w-3 h-3 rounded-full transition-colors ${
+                index === currentTestimonialIndex 
+                  ? 'bg-green-600' 
+                  : 'bg-gray-300 hover:bg-gray-400'
+              }`}
+              aria-label={`Go to testimonial ${index + 1}`}
+            />
+          ))}
+        </div>
+
+        {/* Navigation Arrows (Optional - Remove if not needed) */}
+        <button
+          onClick={handlePrevTestimonial}
+          className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 bg-white text-green-800 w-8 h-8 rounded-full flex items-center justify-center shadow-md hover:bg-green-50 z-10 border border-green-200 hidden md:block"
+          aria-label="Previous"
+        >
+          ‹
+        </button>
+        <button
+          onClick={handleNextTestimonial}
+          className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 bg-white text-green-800 w-8 h-8 rounded-full flex items-center justify-center shadow-md hover:bg-green-50 z-10 border border-green-200 hidden md:block"
+          aria-label="Next"
+        >
+          ›
+        </button>
+      </div>
+    ) : (
+      <div className="text-center py-12">
+        <p className="text-gray-500">No testimonials available.</p>
+      </div>
+    )}
+  </div>
+</section>
 
       {/* Partners */}
       {partners.length > 0 ? (
@@ -574,7 +597,7 @@ const heroImages = [
                         alt={partner.name}
                         className="max-h-16 mx-auto object-contain"
                         onError={(e) => {
-                          (e.target as HTMLImageElement).src = '/images/placeholder.jpg'; // ← Fixed fallback
+                          (e.target as HTMLImageElement).src = '/images/placeholder.jpg';
                         }}
                       />
                     </div>
@@ -587,7 +610,6 @@ const heroImages = [
               ))}
             </div>
 
-            {/* Pagination */}
             {totalPartnerPages > 1 && (
               <div className="flex flex-col sm:flex-row justify-center items-center mt-10 space-y-4 sm:space-y-0 sm:space-x-6">
                 <span className="text-gray-700">
@@ -631,4 +653,4 @@ const heroImages = [
       )}
     </div>
   );
-} 
+}

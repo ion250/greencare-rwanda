@@ -68,7 +68,7 @@ PublishedDocumentSchema.index({ uploadedBy: 1 });
 PublishedDocumentSchema.virtual('fullFileUrl').get(function() {
   // Add base URL if not already present
   if (this.fileUrl && !this.fileUrl.startsWith('http')) {
-    return `${process.env.BASE_URL || 'http://localhost:5000'}${this.fileUrl}`;
+    return `${process.env.BASE_URL}${this.fileUrl}`;
   }
   return this.fileUrl;
 });
