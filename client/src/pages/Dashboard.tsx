@@ -9,7 +9,7 @@ export default function Dashboard() {
     products: 0,
     orders: 0
   });
-  const [recentActivity, setRecentActivity] = useState<any[]>([]);
+  // ✅ REMOVED: recentActivity state
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -50,51 +50,8 @@ export default function Dashboard() {
         orders: ordersRes.data.count
       });
 
-      // Fetch real recent activity including orders
-      const activityRes = await axios.get(`${API_BASE}api/activity/recent`, config).catch(() => ({ data: [] }));
-      
-      // If we can't get real data, use mock data
-      const activityData = activityRes.data.length > 0 ? activityRes.data : [
-        {
-          id: 1,
-          action: 'New order received',
-          details: 'Grekompost - 5 tons',
-          time: '1 hour ago',
-          type: 'order',
-          status: 'pending'
-        },
-        {
-          id: 2,
-          action: 'New article published',
-          details: 'Innovative Plastic Recycling Solutions',
-          time: '2 hours ago',
-          type: 'article'
-        },
-        {
-          id: 3,
-          action: 'New order confirmed',
-          details: 'Recycled Pavers - 100 units',
-          time: '5 hours ago',
-          type: 'order',
-          status: 'confirmed'
-        },
-        {
-          id: 4,
-          action: 'New user registered',
-          details: 'Jeanine Uwase',
-          time: '1 day ago',
-          type: 'user'
-        },
-        {
-          id: 5,
-          action: 'New product added',
-          details: 'Recycled Pavers',
-          time: '3 days ago',
-          type: 'product'
-        }
-      ];
+      // ✅ REMOVED: recent activity fetching logic
 
-      setRecentActivity(activityData);
     } catch (err) {
       console.error('Error fetching dashboard data:', err);
       setError('Failed to load dashboard data. Please try again later.');
@@ -209,40 +166,7 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Recent Activity */}
-          <div className="bg-white shadow rounded-lg">
-            <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
-              <h2 className="text-lg font-medium text-gray-900">Recent Activity</h2>
-            </div>
-            <div className="px-4 py-5 sm:p-6">
-              {recentActivity.length === 0 ? (
-                <p className="text-gray-500">No recent activity.</p>
-              ) : (
-                <ul className="divide-y divide-gray-200">
-                  {recentActivity.map((activity) => (
-                    <li key={activity.id} className="py-2">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center">
-                          {activity.type === 'order' && (
-                            <div className={`w-2 h-2 rounded-full mr-2 ${
-                              activity.status === 'pending' ? 'bg-yellow-400' :
-                              activity.status === 'confirmed' ? 'bg-green-400' :
-                              'bg-blue-400'
-                            }`}></div>
-                          )}
-                          <div>
-                            <p className="text-sm font-medium text-gray-900">{activity.action}</p>
-                            <p className="text-sm text-gray-500">{activity.details}</p>
-                          </div>
-                        </div>
-                        <span className="text-xs text-gray-400">{activity.time}</span>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          </div>
+          {/* ✅ REMOVED: Recent Activity Section */}
 
           {/* Quick Actions */}
           <div className="mt-8 bg-white shadow rounded-lg">
@@ -262,7 +186,7 @@ export default function Dashboard() {
                 </button>
                 <button 
                   onClick={() => window.location.href = '/dashboard/products'}
-                  className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors flex items-center justify-center"
+                  className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-colors flex items-center justify-center"
                 >
                   <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -280,7 +204,7 @@ export default function Dashboard() {
                 </button>
                 <button 
                   onClick={() => window.location.href = '/dashboard/users'}
-                  className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-colors flex items-center justify-center"
+                  className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors flex items-center justify-center"
                 >
                   <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
