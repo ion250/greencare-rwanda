@@ -46,7 +46,7 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/greencare
 .then(() => console.log('Connected to MongoDB'))
 .catch(err => console.error('Could not connect to MongoDB', err));
 
-// Root route
+// Root routes
 app.get('/', (req, res) => {
   res.json({ message: 'GreenCare Rwanda API' });
 });
