@@ -156,12 +156,16 @@ export default function Home() {
     }, 1000 / 60);
   };
 
+  // ✅ FIXED: Correct API response handling
   const fetchLatestArticles = async () => {
     try {
       setLoading(true);
       setError("");
-      const res = await axios.get<Article[]>(`${API_BASE}api/articles?limit=3`);
-      setArticles(Array.isArray(res.data) ? res.data : []);
+      const res = await axios.get<{ success: boolean; articles: Article[] }>(
+        `${API_BASE}api/articles?limit=3`
+      );
+      const articlesData = res.data.success ? res.data.articles : [];
+      setArticles(Array.isArray(articlesData) ? articlesData : []);
     } catch (err) {
       console.error("Error fetching articles:", err);
       setError("Failed to load latest articles.");
@@ -392,7 +396,7 @@ export default function Home() {
         </div>
       </section>
 
-   {/* Latest Articles */}
+      {/* Latest Articles */}
 <section className="py-16 bg-gray-50">
   <div className="container mx-auto px-4">
     <h2 className="text-3xl md:text-4xl font-bold text-green-800 text-center mb-8">
@@ -410,61 +414,54 @@ export default function Home() {
     )}
 
     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-      {articles.length > 0 ? (
-        articles.slice(0, 3).map((article) => {
-          // ✅ FIXED: Proper image URL construction
-          let imageUrl = "/images/placeholder.jpg";
-          if (article.image) {
-            if (article.image.startsWith("http")) {
-              imageUrl = article.image;
-            } else {
-              // Ensure single slash between base URL and image path
-              const basePath = API_BASE.replace(/\/+$/, ""); // Remove trailing slashes
-              const imagePath = article.image.replace(/^\/+/, ""); // Remove leading slashes
-              imageUrl = `${basePath}/${imagePath}`;
-            }
+      {articles.slice(0, 3).map((article) => {
+        // ✅ FIXED: Robust image URL construction
+        let imageUrl = "/images/placeholder.jpg";
+        if (article.image) {
+          if (article.image.startsWith("http")) {
+            imageUrl = article.image;
+          } else {
+            const basePath = API_BASE.replace(/\/+$/, "");
+            const imagePath = article.image.replace(/^\/+/, "");
+            imageUrl = `${basePath}/${imagePath}`;
           }
+        }
 
-          return (
-            <article
-              key={article._id}
-              className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col hover:shadow-lg transition-shadow"
-            >
-              <img
-                src={imageUrl}
-                alt={article.title}
-                className="w-full h-48 object-cover"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = "/images/placeholder.jpg";
-                }}
-              />
-              <div className="p-6 flex-grow">
-                <div className="flex items-center text-sm text-gray-500 mb-2">
-                  <span>{article.author || "GreenCare Team"}</span>
-                  <span className="mx-2">•</span>
-                  <span>{new Date(article.createdAt).toLocaleDateString()}</span>
-                </div>
-                <h3 className="text-xl font-bold text-green-800 mb-3 line-clamp-2">
-                  {article.title}
-                </h3>
-                <p className="text-gray-700 mb-4 line-clamp-3">
-                  {article.description}
-                </p>
-                <Link
-                  to={`/blog/${article.slug}`}
-                  className="text-green-600 font-semibold hover:text-green-800 transition-colors inline-flex items-center"
-                >
-                  Read More →
-                </Link>
+        return (
+          <article
+            key={article._id}
+            className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col hover:shadow-lg transition-shadow"
+          >
+            <img
+              src={imageUrl}
+              alt={article.title}
+              className="w-full h-48 object-cover"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = "/images/placeholder.jpg";
+              }}
+            />
+            <div className="p-6 flex-grow">
+              <div className="flex items-center text-sm text-gray-500 mb-2">
+                <span>{article.author || "GreenCare Team"}</span>
+                <span className="mx-2">•</span>
+                <span>{new Date(article.createdAt).toLocaleDateString()}</span>
               </div>
-            </article>
-          );
-        })
-      ) : (
-        <div className="col-span-3 text-center py-8">
-          <p className="text-gray-700">No articles available at the moment.</p>
-        </div>
-      )}
+              <h3 className="text-xl font-bold text-green-800 mb-3 line-clamp-2">
+                {article.title}
+              </h3>
+              <p className="text-gray-700 mb-4 line-clamp-3">
+                {article.description}
+              </p>
+              <Link
+                to={`/blog/${article.slug}`}
+                className="text-green-600 font-semibold hover:text-green-800 transition-colors inline-flex items-center"
+              >
+                Read More →
+              </Link>
+            </div>
+          </article>
+        );
+      })}
     </div>
 
     <div className="text-center mt-12">
@@ -479,96 +476,96 @@ export default function Home() {
 </section>
 
       {/* ===== WORKING TESTIMONIALS CAROUSEL ===== */}
-<section id="testimonials" className="py-16 bg-white">
-  <div className="container mx-auto px-4">
-    <div className="text-center mb-12">
-      <h2 className="text-3xl md:text-4xl font-bold text-green-800 mb-4">What People Say</h2>
-      <p className="text-gray-600 max-w-2xl mx-auto">
-        Hear from our partners, clients, and community members.
-      </p>
-    </div>
-
-    {testimonials.length > 0 ? (
-      <div className="relative max-w-4xl mx-auto">
-        {/* Single testimonial display (centered) */}
-        <div className="bg-white rounded-2xl shadow-lg p-8 text-center border border-green-100">
-          <div className="flex flex-col items-center mb-6">
-            <img
-              src={testimonials[currentTestimonialIndex]?.image || "/images/placeholder.jpg"}
-              alt={testimonials[currentTestimonialIndex]?.name || "Client"}
-              className="w-20 h-20 rounded-full object-cover border-2 border-green-500 mb-4"
-              onError={(e) => (e.target as HTMLImageElement).src = "/images/placeholder.jpg"}
-            />
-            <h3 className="font-bold text-xl text-gray-900">
-              {testimonials[currentTestimonialIndex]?.name}
-            </h3>
-            {testimonials[currentTestimonialIndex]?.position && (
-              <p className="text-green-600 mt-1">
-                {testimonials[currentTestimonialIndex]?.position}
-                {testimonials[currentTestimonialIndex]?.company && 
-                  ` • ${testimonials[currentTestimonialIndex]?.company}`}
-              </p>
-            )}
+      <section id="testimonials" className="py-16 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-green-800 mb-4">What People Say</h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Hear from our partners, clients, and community members.
+            </p>
           </div>
-          <p className="text-gray-700 italic text-lg max-w-2xl mx-auto">
-            "{testimonials[currentTestimonialIndex]?.content}"
-          </p>
-          <div className="mt-6 flex justify-center">
-            {[...Array(5)].map((_, i) => (
-              <svg
-                key={i}
-                className={`w-6 h-6 ${i < (testimonials[currentTestimonialIndex]?.rating || 0) ? 'text-yellow-400' : 'text-gray-300'}`}
-                fill="currentColor"
-                viewBox="0 0 20 20"
+
+          {testimonials.length > 0 ? (
+            <div className="relative max-w-4xl mx-auto">
+              {/* Single testimonial display (centered) */}
+              <div className="bg-white rounded-2xl shadow-lg p-8 text-center border border-green-100">
+                <div className="flex flex-col items-center mb-6">
+                  <img
+                    src={testimonials[currentTestimonialIndex]?.image || "/images/placeholder.jpg"}
+                    alt={testimonials[currentTestimonialIndex]?.name || "Client"}
+                    className="w-20 h-20 rounded-full object-cover border-2 border-green-500 mb-4"
+                    onError={(e) => (e.target as HTMLImageElement).src = "/images/placeholder.jpg"}
+                  />
+                  <h3 className="font-bold text-xl text-gray-900">
+                    {testimonials[currentTestimonialIndex]?.name}
+                  </h3>
+                  {testimonials[currentTestimonialIndex]?.position && (
+                    <p className="text-green-600 mt-1">
+                      {testimonials[currentTestimonialIndex]?.position}
+                      {testimonials[currentTestimonialIndex]?.company && 
+                        ` • ${testimonials[currentTestimonialIndex]?.company}`}
+                    </p>
+                  )}
+                </div>
+                <p className="text-gray-700 italic text-lg max-w-2xl mx-auto">
+                  "{testimonials[currentTestimonialIndex]?.content}"
+                </p>
+                <div className="mt-6 flex justify-center">
+                  {[...Array(5)].map((_, i) => (
+                    <svg
+                      key={i}
+                      className={`w-6 h-6 ${i < (testimonials[currentTestimonialIndex]?.rating || 0) ? 'text-yellow-400' : 'text-gray-300'}`}
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.357 4.18a1 1 0 00.95.69h4.392c.969 0 1.371 1.24.588 1.81l-3.56 2.585a1 1 0 00-.364 1.118l1.358 4.18c.3.921-.755 1.688-1.54 1.118l-3.56-2.585a1 1 0 00-1.175 0l-3.56 2.585c-.784.57-1.838-.197-1.539-1.118l1.357-4.18a1 1 0 00-.364-1.118L2.76 9.607c-.783-.57-.38-1.81.588-1.81h4.392a1 1 0 00.95-.69l1.357-4.18z" />
+                    </svg>
+                  ))}
+                </div>
+              </div>
+
+              {/* Navigation Dots */}
+              <div className="flex justify-center mt-8 space-x-2">
+                {testimonials.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => {
+                      setCurrentTestimonialIndex(index);
+                      resetAutoPlay();
+                    }}
+                    className={`w-3 h-3 rounded-full transition-colors ${
+                      index === currentTestimonialIndex 
+                        ? 'bg-green-600' 
+                        : 'bg-gray-300 hover:bg-gray-400'
+                    }`}
+                    aria-label={`Go to testimonial ${index + 1}`}
+                  />
+                ))}
+              </div>
+
+              {/* Navigation Arrows */}
+              <button
+                onClick={handlePrevTestimonial}
+                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 bg-white text-green-800 w-8 h-8 rounded-full flex items-center justify-center shadow-md hover:bg-green-50 z-10 border border-green-200 hidden md:block"
+                aria-label="Previous"
               >
-                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.357 4.18a1 1 0 00.95.69h4.392c.969 0 1.371 1.24.588 1.81l-3.56 2.585a1 1 0 00-.364 1.118l1.358 4.18c.3.921-.755 1.688-1.54 1.118l-3.56-2.585a1 1 0 00-1.175 0l-3.56 2.585c-.784.57-1.838-.197-1.539-1.118l1.357-4.18a1 1 0 00-.364-1.118L2.76 9.607c-.783-.57-.38-1.81.588-1.81h4.392a1 1 0 00.95-.69l1.357-4.18z" />
-              </svg>
-            ))}
-          </div>
+                ‹
+              </button>
+              <button
+                onClick={handleNextTestimonial}
+                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 bg-white text-green-800 w-8 h-8 rounded-full flex items-center justify-center shadow-md hover:bg-green-50 z-10 border border-green-200 hidden md:block"
+                aria-label="Next"
+              >
+                ›
+              </button>
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-gray-500">No testimonials available.</p>
+            </div>
+          )}
         </div>
-
-        {/* Navigation Dots */}
-        <div className="flex justify-center mt-8 space-x-2">
-          {testimonials.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => {
-                setCurrentTestimonialIndex(index);
-                resetAutoPlay();
-              }}
-              className={`w-3 h-3 rounded-full transition-colors ${
-                index === currentTestimonialIndex 
-                  ? 'bg-green-600' 
-                  : 'bg-gray-300 hover:bg-gray-400'
-              }`}
-              aria-label={`Go to testimonial ${index + 1}`}
-            />
-          ))}
-        </div>
-
-        {/* Navigation Arrows (Optional - Remove if not needed) */}
-        <button
-          onClick={handlePrevTestimonial}
-          className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 bg-white text-green-800 w-8 h-8 rounded-full flex items-center justify-center shadow-md hover:bg-green-50 z-10 border border-green-200 hidden md:block"
-          aria-label="Previous"
-        >
-          ‹
-        </button>
-        <button
-          onClick={handleNextTestimonial}
-          className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 bg-white text-green-800 w-8 h-8 rounded-full flex items-center justify-center shadow-md hover:bg-green-50 z-10 border border-green-200 hidden md:block"
-          aria-label="Next"
-        >
-          ›
-        </button>
-      </div>
-    ) : (
-      <div className="text-center py-12">
-        <p className="text-gray-500">No testimonials available.</p>
-      </div>
-    )}
-  </div>
-</section>
+      </section>
 
       {/* Partners */}
       {partners.length > 0 ? (

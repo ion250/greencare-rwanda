@@ -2,8 +2,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-const API_BASE =
-  import.meta.env.VITE_API_BASE?.replace(/\/$/, "") ;
+const API_BASE = import.meta.env.VITE_API_BASE?.replace(/\/$/, "");
 
 interface Article {
   _id: string;
@@ -52,19 +51,29 @@ export default function Blog() {
         const token = localStorage.getItem("authToken");
         const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
 
-        // ✅ Fetch Articles
-        const { data: articleData } = await axios.get(`${API_BASE}/api/articles`, config);
-        const formattedArticles = articleData.map((article: Article) => ({
-          ...article,
-          image: article.image
-            ? article.image.startsWith("http")
-              ? article.image
-              : `${API_BASE}${article.image.startsWith("/") ? "" : "/"}${article.image}`
-            : "/uploads/placeholder.jpg",
-        }));
+        const articleRes = await axios.get<{ success: boolean; articles: Article[] }>(
+          `${API_BASE}/api/articles`,
+          config
+        );
+
+        
+        const formattedArticles = (articleRes.data.articles || []).map((article) => {
+          let imageUrl = "/images/placeholder.jpg";
+          if (article.image) {
+            if (article.image.startsWith("http")) {
+              imageUrl = article.image;
+            } else {
+              const cleanApiBase = API_BASE.replace(/\/+$/, ""); 
+              const cleanImagePath = article.image.replace(/^\/+/, ""); 
+              imageUrl = `${cleanApiBase}/${cleanImagePath}`;
+            }
+          }
+          return { ...article, image: imageUrl };
+        });
+
         setArticles(formattedArticles);
 
-        // ✅ Fetch Documents
+        // ✅ Published Documents 
         const { data: docData } = await axios.get(`${API_BASE}/api/documents`);
         const sortedDocs = docData.documents.sort(
           (a: PublishedDocument, b: PublishedDocument) =>
@@ -160,7 +169,7 @@ export default function Blog() {
                       alt={article.title}
                       className="w-full h-48 object-cover"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = "/uploads/placeholder.jpg";
+                        (e.target as HTMLImageElement).src = "/images/placeholder.jpg";
                       }}
                     />
                     <div className="p-6">
@@ -207,7 +216,7 @@ export default function Blog() {
           )}
         </div>
 
-        {/* ===== Documents Sidebar ===== */}
+        {/* ===== Documents Sidebar (UNCHANGED) ===== */}
         <aside className="bg-white rounded-2xl shadow-md p-6 h-fit sticky top-20">
           <h2 className="text-2xl font-bold text-green-800 mb-6">Published Documents</h2>
 
@@ -221,7 +230,6 @@ export default function Blog() {
                   <div key={doc._id} className="mb-5 pb-5 border-b last:border-none">
                     <h3 className="font-semibold text-gray-800 mb-2">{doc.title}</h3>
                     <p className="text-gray-600 text-sm line-clamp-2 mb-2">{doc.description}</p>
-                    {/* ✅ CHANGED: Download in new tab */}
                     <button
                       onClick={() => {
                         const newTab = window.open(cleanUrl, '_blank');
@@ -242,7 +250,6 @@ export default function Blog() {
                 );
               })}
 
-              {/* ===== Document Pagination ===== */}
               {publishedDocuments.length > documentsPerPage && (
                 <div className="mt-6 flex justify-center gap-3">
                   <button

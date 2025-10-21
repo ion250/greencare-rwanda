@@ -50,29 +50,21 @@ const shareTo = (platform: 'whatsapp' | 'facebook' | 'twitter' | 'linkedin') => 
 
   switch (platform) {
     case 'whatsapp':
-      // Plain text: Title + Description + URL
       const whatsappText = encodeURIComponent(`${title}\n\n${description}\n\n${articleUrl}`);
       shareUrl = `https://wa.me/?text=${whatsappText}`;
       break;
-
     case 'facebook':
-      // Use quote parameter for caption
       const facebookQuote = encodeURIComponent(`${title}\n\n${description}`);
       shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(articleUrl)}&quote=${facebookQuote}`;
       break;
-
     case 'twitter':
-      // Full message in tweet
       const tweetText = encodeURIComponent(`${title}\n\n${description}\n\n${articleUrl}`);
       shareUrl = `https://twitter.com/intent/tweet?text=${tweetText}`;
       break;
-
     case 'linkedin':
-      // Summary parameter for LinkedIn
       const linkedinSummary = encodeURIComponent(`${title}\n\n${description}`);
       shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(articleUrl)}&summary=${linkedinSummary}`;
       break;
-
     default:
       return;
   }
@@ -92,26 +84,33 @@ const shareTo = (platform: 'whatsapp' | 'facebook' | 'twitter' | 'linkedin') => 
       const token = localStorage.getItem('authToken');
       const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
 
-      // Fetch the main article
-      const res = await axios.get(`${API_BASE}api/articles/${slug}`, config);
-      const data = res.data;
+      // ✅ FIXED: Handle { success: true, article: {...} } response
+      const res = await axios.get<{ success: boolean; article: Article }>(
+        `${API_BASE}api/articles/${slug}`,
+        config
+      );
 
-      if (!data) throw new Error('Article not found');
+      if (!res.data.success || !res.data.article) {
+        throw new Error('Article not found');
+      }
 
       const formattedArticle = {
-        ...data,
-        image: formatImageUrl(data.image),
+        ...res.data.article,
+        image: formatImageUrl(res.data.article.image),
       };
       setArticle(formattedArticle);
 
-      // Fetch all articles to find related ones
-      const articlesRes = await axios.get(`${API_BASE}api/articles`, config);
-      const allArticles: Article[] = Array.isArray(articlesRes.data) ? articlesRes.data : [];
+      // Fetch all articles for related
+      const articlesRes = await axios.get<{ success: boolean; articles: Article[] }>(
+        `${API_BASE}api/articles`,
+        config
+      );
+      const allArticles = articlesRes.data.articles || [];
 
-      // ✅ Filter: DIFFERENT author, exclude current article → ONLY 3 ARTICLES
+      // Filter: different author, exclude current
       const filteredRelated = allArticles
-        .filter((a) => a.slug !== slug && a.author !== data.author) // Different author
-        .slice(0, 3) // Exactly 3 articles
+        .filter((a) => a.slug !== slug && a.author !== res.data.article.author)
+        .slice(0, 3)
         .map((a) => ({
           ...a,
           image: formatImageUrl(a.image),
