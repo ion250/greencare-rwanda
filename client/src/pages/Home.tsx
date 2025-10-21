@@ -385,7 +385,7 @@ export default function Home() {
                 <h3 className="text-xl md:text-2xl font-bold text-green-800 mb-4">{service.title}</h3>
                 <p className="text-gray-700 mb-6">{service.desc}</p>
                 <Link
-                  to="/contact"
+                  to="/services"
                   className="inline-block bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition-colors"
                 >
                   Contact Us
