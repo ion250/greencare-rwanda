@@ -369,7 +369,7 @@ export default function Contact() {
                         <div className="ml-4">
                           <h3 className="text-xl font-bold text-gray-800">Email Us</h3>
                           <a href="mailto:info@greencarerwandaltd.com" className="text-green-600 hover:text-green-800 text-lg font-semibold">
-                            info@greencarerwandaltd.com
+                            info@greencarerwanda.com
                           </a>
                         </div>
                       </div>

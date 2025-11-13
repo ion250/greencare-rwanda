@@ -102,7 +102,7 @@ export default function Footer() {
                 </svg>
                 View on Google Maps
               </a>
-              <p className="text-green-100">info@greencarerwandaltd.com</p>
+              <p className="text-green-100">info@greencarerwanda.com</p>
               <p className="text-green-100">+250 796 142 965 CUSTOMER CARE</p>
               <p className="text-green-100">+250 784 030 834 OFFICE</p>
               
