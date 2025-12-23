@@ -1,6 +1,5 @@
 import { useState } from "react";
 
-
 // Define team member type
 interface TeamMember {
   name: string;
@@ -89,12 +88,20 @@ export default function TeamPage() {
     ],
     staff: [
       {
-        name: "Frontline Staff",
-        title: "Compost Production Team",
-        description: "Our dedicated frontline staff are the heart of our operations, expertly managing waste sorting, composting, and packaging to ensure that every product meets our high standards of quality and sustainability. A significant portion of our team is composed of young men and women. At the Nduba Biowaste Processing Facility and the Huye Recycling Facility, 95% of our 30 permanent staff are youth, contributing to both environmental sustainability and youth empowerment.",
-        image: "/images/team/staff.jpg"
-      }
-    ]
+        name: "Nduba Biowaste Processing Facility",
+        title: "Kigali Compost Production Team",
+        description:
+          "At the Nduba Biowaste Processing Facility in Kigali, frontline staff play a vital role in managing organic waste streams and producing high-quality compost. Their responsibilities include waste sorting, compost pile formation, regular turning of piles, sieving mature compost, crushing oversized materials, and packaging the finished product. Out of the facility’s 20 permanent staff, 95% are young men and women — reflecting our strong commitment to youth employment and empowerment. Through hands-on training and daily operations, these young professionals gain practical skills in composting techniques, environmental protection, and sustainable agriculture.",
+        image: "/images/team/nduba.jpg",
+      },
+      {
+        name: "Huye Recycling Facility",
+        title: "Huye Compost & Recycling Team",
+        description:
+          "The Huye Recycling Facility employs a dedicated frontline team responsible for compost production and waste-sorting operations. The team carries out waste sorting, pile formation, turning of compost piles, sieving and crushing compost, and packaging the final product — ensuring efficiency and quality throughout the process. With 15 permanent staff, 95% of whom are youth, the facility provides meaningful green job opportunities for young people in Rwanda. Their work contributes to effective waste management, supports environmental sustainability, and strengthens local livelihoods through skills development and participation in the circular economy.",
+        image: "/images/team/huye.jpg",
+      },
+    ],
   };
 
   return (
@@ -158,8 +165,12 @@ export default function TeamPage() {
           </div>
 
           {/* Team Members */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {teamMembers[activeTab].map((member: TeamMember, index: number) => (
+          <div className={`grid gap-8 ${
+            activeTab === 'staff' 
+              ? 'grid-cols-1 md:grid-cols-2' 
+              : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+          }`}>
+            {teamMembers[activeTab].map((member, index) => (
               <div 
                 key={`${activeTab}-${index}`}
                 className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow"
