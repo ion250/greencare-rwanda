@@ -4,7 +4,7 @@ import axios from "axios";
 
 const API_BASE = import.meta.env.VITE_API_BASE?.replace(/\/$/, '') + '/';
 
-// Types
+// ✅ UPDATED: Article interface now includes optional sdgs array
 interface Article {
   _id: string;
   title: string;
@@ -14,6 +14,7 @@ interface Article {
   author: string;
   createdAt: string;
   slug: string;
+  sdgs?: string[];  // ← ADDED THIS
 }
 
 interface Testimonial {
@@ -156,7 +157,6 @@ export default function Home() {
     }, 1000 / 60);
   };
 
-  // ✅ FIXED: Correct API response handling
   const fetchLatestArticles = async () => {
     try {
       setLoading(true);
@@ -202,6 +202,32 @@ export default function Home() {
     partnerPage * ITEMS_PER_PAGE,
     (partnerPage + 1) * ITEMS_PER_PAGE
   );
+
+  // ✅ NEW: SDG Helper Functions (add these inside Home component)
+  const getSDGColor = (sdgId: string): string => {
+    const colors: { [key: string]: string } = {
+      '1': 'bg-[#E5243B]', '2': 'bg-[#DDA63A]', '3': 'bg-[#4C9F38]',
+      '4': 'bg-[#C5192D]', '5': 'bg-[#FF3A21]', '6': 'bg-[#26BDE2]',
+      '7': 'bg-[#FCC30B]', '8': 'bg-[#A21942]', '9': 'bg-[#FD6925]',
+      '10': 'bg-[#DD1367]', '11': 'bg-[#FD9D24]', '12': 'bg-[#BF8B2E]',
+      '13': 'bg-[#3F7E44]', '14': 'bg-[#0A97D9]', '15': 'bg-[#56C02B]',
+      '16': 'bg-[#00689D]', '17': 'bg-[#19486A]'
+    };
+    return colors[sdgId] || 'bg-gray-600';
+  };
+
+  const getSDGShortName = (sdgId: string): string => {
+    const names: { [key: string]: string } = {
+      '1': 'No Poverty', '2': 'Zero Hunger', '3': 'Good Health',
+      '4': 'Quality Education', '5': 'Gender Equality', '6': 'Clean Water',
+      '7': 'Clean Energy', '8': 'Decent Work', '9': 'Industry & Innovation',
+      '10': 'Reduced Inequalities', '11': 'Sustainable Cities',
+      '12': 'Responsible Consumption', '13': 'Climate Action',
+      '14': 'Life Below Water', '15': 'Life on Land',
+      '16': 'Peace & Justice', '17': 'Partnerships'
+    };
+    return names[sdgId] || '';
+  };
 
   return (
     <div className="min-h-screen bg-white pt-16">
@@ -396,86 +422,135 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Latest Articles */}
-<section className="py-16 bg-gray-50">
-  <div className="container mx-auto px-4">
-    <h2 className="text-3xl md:text-4xl font-bold text-green-800 text-center mb-8">
-      Latest Articles
-    </h2>
-    <p className="text-center text-gray-700 text-lg max-w-2xl mx-auto mb-12">
-      Stay informed about sustainability practices, waste management innovations, 
-      and the benefits of composting.
-    </p>
-
-    {error && (
-      <div className="bg-red-100 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-6 text-center">
-        {error}
-      </div>
-    )}
-
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-      {articles.slice(0, 3).map((article) => {
-        // ✅ FIXED: Robust image URL construction
-        let imageUrl = "/images/placeholder.jpg";
-        if (article.image) {
-          if (article.image.startsWith("http")) {
-            imageUrl = article.image;
-          } else {
-            const basePath = API_BASE.replace(/\/+$/, "");
-            const imagePath = article.image.replace(/^\/+/, "");
-            imageUrl = `${basePath}/${imagePath}`;
-          }
-        }
-
-        return (
-          <article
-            key={article._id}
-            className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col hover:shadow-lg transition-shadow"
-          >
-            <img
-              src={imageUrl}
-              alt={article.title}
-              className="w-full h-48 object-cover"
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = "/images/placeholder.jpg";
-              }}
-            />
-            <div className="p-6 flex-grow">
-              <div className="flex items-center text-sm text-gray-500 mb-2">
-                <span>{article.author || "GreenCare Team"}</span>
-                <span className="mx-2">•</span>
-                <span>{new Date(article.createdAt).toLocaleDateString()}</span>
-              </div>
-              <h3 className="text-xl font-bold text-green-800 mb-3 line-clamp-2">
-                {article.title}
-              </h3>
-              <p className="text-gray-700 mb-4 line-clamp-3">
-                {article.description}
+      {/* ✅ UPDATED: Latest Articles Section with SDG Badges */}
+      <section className="py-16 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-8">
+            <div>
+              <h2 className="text-3xl md:text-4xl font-bold text-green-800 mb-2">
+                Latest Articles
+              </h2>
+              <p className="text-gray-700 text-lg max-w-2xl">
+                Stay informed about sustainability practices, waste management innovations, 
+                and the benefits of composting.
               </p>
-              <Link
-                to={`/blog/${article.slug}`}
-                className="text-green-600 font-semibold hover:text-green-800 transition-colors inline-flex items-center"
-              >
-                Read More →
-              </Link>
             </div>
-          </article>
-        );
-      })}
-    </div>
+            <Link
+              to="/blog"
+              className="mt-4 md:mt-0 inline-flex items-center text-green-700 font-semibold hover:text-green-800 transition"
+            >
+              View All Articles →
+            </Link>
+          </div>
 
-    <div className="text-center mt-12">
-      <Link
-        to="/blog"
-        className="bg-green-600 text-white px-8 py-3 rounded-md hover:bg-green-700 transition-colors inline-block"
-      >
-        View All Articles
-      </Link>
-    </div>
-  </div>
-</section>
+          {error && (
+            <div className="bg-red-100 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-6 text-center">
+              {error}
+            </div>
+          )}
 
-      {/* ===== WORKING TESTIMONIALS CAROUSEL ===== */}
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="bg-white rounded-lg shadow-md overflow-hidden animate-pulse">
+                  <div className="w-full h-48 bg-gray-200" />
+                  <div className="p-6 space-y-3">
+                    <div className="h-4 bg-gray-200 rounded w-1/2" />
+                    <div className="h-6 bg-gray-200 rounded w-3/4" />
+                    <div className="h-4 bg-gray-200 rounded w-full" />
+                    <div className="h-4 bg-gray-200 rounded w-5/6" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : articles.length === 0 ? (
+            <div className="bg-white text-center py-16 rounded-lg shadow-md">
+              <p className="text-gray-500">No articles available yet.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {articles.slice(0, 3).map((article) => {
+                // Image URL logic (unchanged)
+                let imageUrl = "/images/placeholder.jpg";
+                if (article.image) {
+                  if (article.image.startsWith("http")) {
+                    imageUrl = article.image;
+                  } else {
+                    const basePath = API_BASE.replace(/\/+$/, "");
+                    const imagePath = article.image.replace(/^\/+/, "");
+                    imageUrl = `${basePath}/${imagePath}`;
+                  }
+                }
+
+                return (
+                  <article
+                    key={article._id}
+                    className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col hover:shadow-lg transition-shadow group"
+                  >
+                    <div className="relative">
+                      <img
+                        src={imageUrl}
+                        alt={article.title}
+                        className="w-full h-48 object-cover transition-transform group-hover:scale-105"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = "/images/placeholder.jpg";
+                        }}
+                      />
+                      
+                      {/* ✅ SDG Badges Overlay */}
+                      {article.sdgs && article.sdgs.length > 0 && (
+                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3">
+                          <div className="flex flex-wrap gap-1.5">
+                            {article.sdgs.slice(0, 3).map((sdgId: string) => (
+                              <Link
+                                key={sdgId}
+                                to={`/blog?sdg=${sdgId}`}
+                                className={`${getSDGColor(sdgId)} text-white rounded px-2 py-1 flex items-center gap-1 text-xs font-semibold hover:opacity-90 transition-opacity`}
+                                title={`Filter by SDG ${sdgId}: ${getSDGShortName(sdgId)}`}
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <span className="font-bold">{sdgId}</span>
+                                <span className="hidden sm:inline">{getSDGShortName(sdgId)}</span>
+                              </Link>
+                            ))}
+                            {article.sdgs.length > 3 && (
+                              <span className="bg-gray-800/90 text-white text-xs font-bold px-2 py-1 rounded">
+                                +{article.sdgs.length - 3}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="p-6 flex-grow flex flex-col">
+                      <div className="flex items-center text-sm text-gray-500 mb-2">
+                        <span className="text-green-700 font-medium">{article.author || "GreenCare Team"}</span>
+                        <span className="mx-2">•</span>
+                        <time>{new Date(article.createdAt).toLocaleDateString()}</time>
+                      </div>
+                      <h3 className="text-xl font-bold text-green-800 mb-3 line-clamp-2 group-hover:text-green-700 transition-colors">
+                        {article.title}
+                      </h3>
+                      <p className="text-gray-700 mb-4 line-clamp-3 flex-grow">
+                        {article.description}
+                      </p>
+                      <Link
+                        to={`/blog/${article.slug}`}
+                        className="text-green-600 font-semibold hover:text-green-800 transition-colors inline-flex items-center mt-auto"
+                      >
+                        Read More →
+                      </Link>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Testimonials Section (unchanged) */}
       <section id="testimonials" className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
@@ -487,7 +562,6 @@ export default function Home() {
 
           {testimonials.length > 0 ? (
             <div className="relative max-w-4xl mx-auto">
-              {/* Single testimonial display (centered) */}
               <div className="bg-white rounded-2xl shadow-lg p-8 text-center border border-green-100">
                 <div className="flex flex-col items-center mb-6">
                   <img
@@ -524,7 +598,6 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Navigation Dots */}
               <div className="flex justify-center mt-8 space-x-2">
                 {testimonials.map((_, index) => (
                   <button
@@ -543,7 +616,6 @@ export default function Home() {
                 ))}
               </div>
 
-              {/* Navigation Arrows */}
               <button
                 onClick={handlePrevTestimonial}
                 className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 bg-white text-green-800 w-8 h-8 rounded-full flex items-center justify-center shadow-md hover:bg-green-50 z-10 border border-green-200 hidden md:block"
@@ -567,7 +639,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Partners */}
+      {/* Partners Section (unchanged) */}
       {partners.length > 0 ? (
         <section className="py-16 bg-gray-50">
           <div className="container mx-auto px-4">

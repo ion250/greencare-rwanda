@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
+import { SDGIcon } from '../components/SDGIcon';
 
 // Fix API_BASE to ensure trailing slash
 const API_BASE = import.meta.env.VITE_API_BASE?.replace(/\/$/, '') + '/' ;
@@ -15,6 +16,7 @@ interface Article {
   createdAt: string;
   description: string;
   slug: string;
+  sdgs: string[];
 }
 
 export default function ArticleDetail() {
@@ -31,6 +33,53 @@ export default function ArticleDetail() {
     if (imagePath.startsWith('http')) return imagePath;
     return `${API_BASE}${imagePath.replace(/^\//, '')}`;
   };
+
+ // SDG Color Mapping with official UN colors
+const getSDGColor = (sdgId: string): string => {
+  const sdgColors: { [key: string]: string } = {
+    '1': 'bg-[#E5243B]',
+    '2': 'bg-[#DDA63A]',
+    '3': 'bg-[#4C9F38]',
+    '4': 'bg-[#C5192D]',
+    '5': 'bg-[#FF3A21]',
+    '6': 'bg-[#26BDE2]',
+    '7': 'bg-[#FCC30B]',
+    '8': 'bg-[#A21942]',
+    '9': 'bg-[#FD6925]',
+    '10': 'bg-[#DD1367]',
+    '11': 'bg-[#FD9D24]',
+    '12': 'bg-[#BF8B2E]',
+    '13': 'bg-[#3F7E44]',
+    '14': 'bg-[#0A97D9]',
+    '15': 'bg-[#56C02B]',
+    '16': 'bg-[#00689D]',
+    '17': 'bg-[#19486A]'
+  };
+  return sdgColors[sdgId] || 'bg-gray-600';
+};
+
+const getSDGName = (sdgId: string): string => {
+  const sdgNames: { [key: string]: string } = {
+    '1': 'NO POVERTY',
+    '2': 'ZERO HUNGER',
+    '3': 'GOOD HEALTH AND WELL-BEING',
+    '4': 'QUALITY EDUCATION',
+    '5': 'GENDER EQUALITY',
+    '6': 'CLEAN WATER AND SANITATION',
+    '7': 'AFFORDABLE AND CLEAN ENERGY',
+    '8': 'DECENT WORK AND ECONOMIC GROWTH',
+    '9': 'INDUSTRY, INNOVATION AND INFRASTRUCTURE',
+    '10': 'REDUCED INEQUALITIES',
+    '11': 'SUSTAINABLE CITIES AND COMMUNITIES',
+    '12': 'RESPONSIBLE CONSUMPTION AND PRODUCTION',
+    '13': 'CLIMATE ACTION',
+    '14': 'LIFE BELOW WATER',
+    '15': 'LIFE ON LAND',
+    '16': 'PEACE, JUSTICE AND STRONG INSTITUTIONS',
+    '17': 'PARTNERSHIPS FOR THE GOALS'
+  };
+  return sdgNames[sdgId] || '';
+};
 
   // ✅ SHARE URL GENERATOR
   const getShareUrl = () => {
@@ -208,6 +257,33 @@ const shareTo = (platform: 'whatsapp' | 'facebook' | 'twitter' | 'linkedin') => 
                   <h1 className="text-4xl font-bold text-gray-900 mb-4">{article.title}</h1>
                   <p className="text-lg text-gray-700 italic mb-6">{article.description}</p>
 
+                  
+{article.sdgs && article.sdgs.length > 0 && (
+  <div className="mb-6">
+    <h3 className="text-sm font-semibold text-gray-700 mb-4">
+      Sustainable Development Goals:
+    </h3>
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+      {article.sdgs.map((sdgId: string) => (
+        <div
+          key={sdgId}
+          className={`${getSDGColor(sdgId)} text-white rounded-sm p-3 shadow-md hover:shadow-lg transition-shadow`}
+          title={`SDG ${sdgId}: ${getSDGName(sdgId)}`}
+        >
+          <div className="flex items-start gap-2">
+            <SDGIcon sdgId={sdgId} className="w-10 h-10 flex-shrink-0" />
+            <div className="flex-1">
+              <span className="text-[10px] font-bold uppercase leading-tight block">
+                {getSDGName(sdgId)}
+              </span>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+)}
+
                   {/* Article Content */}
                   <div
                     className="prose prose-green max-w-none"
@@ -260,43 +336,63 @@ const shareTo = (platform: 'whatsapp' | 'facebook' | 'twitter' | 'linkedin') => 
                 </article>
 
                 {/* Related Articles - 3 FROM DIFFERENT AUTHORS */}
-                {relatedArticles.length > 0 && (
-                  <section className="mt-10 bg-white rounded-lg shadow-md p-6">
-                    <h2 className="text-3xl font-bold text-green-800 mb-6">More Articles You Might Like</h2>
-                    <div className="grid md:grid-cols-3 gap-6">
-                      {relatedArticles.map((rel) => (
-                        <Link
-                          key={rel._id}
-                          to={`/blog/${rel.slug}`}
-                          className="block group hover:scale-[1.02] transform transition-all duration-200"
-                        >
-                          <div className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg">
-                            <img
-                              src={rel.image}
-                              alt={rel.title}
-                              className="w-full h-36 object-cover"
-                              loading="lazy"
-                              onError={(e) => {
-                                (e.target as HTMLImageElement).src = '/uploads/placeholder.jpg';
-                              }}
-                            />
-                            <div className="p-4">
-                              <div className="flex items-center text-sm text-gray-500 mb-2">
-                                <span>{rel.author}</span>
-                                <span className="mx-1">•</span>
-                                <time>{new Date(rel.createdAt).toLocaleDateString()}</time>
-                              </div>
-                              <h3 className="font-bold text-gray-900 line-clamp-2 group-hover:text-green-700">
-                                {rel.title}
-                              </h3>
-                              <p className="text-gray-700 text-sm mt-2 line-clamp-3">{rel.description}</p>
-                            </div>
-                          </div>
-                        </Link>
-                      ))}
-                    </div>
-                  </section>
-                )}
+{relatedArticles.length > 0 && (
+  <section className="mt-10 bg-white rounded-lg shadow-md p-6">
+    <h2 className="text-3xl font-bold text-green-800 mb-6">More Articles You Might Like</h2>
+    <div className="grid md:grid-cols-3 gap-6">
+      {relatedArticles.map((rel) => (
+        <Link
+          key={rel._id}
+          to={`/blog/${rel.slug}`}
+          className="block group hover:scale-[1.02] transform transition-all duration-200"
+        >
+          <div className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg">
+            <div className="relative">
+              <img
+                src={rel.image}
+                alt={rel.title}
+                className="w-full h-36 object-cover"
+                loading="lazy"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/uploads/placeholder.jpg';
+                }}
+              />
+              {/* SDG Badges on Related Articles */}
+              {rel.sdgs && rel.sdgs.length > 0 && (
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-2">
+                  <div className="flex flex-wrap gap-1">
+                    {rel.sdgs.slice(0, 3).map((sdgId: string) => (
+                      <div
+                        key={sdgId}
+                        className={`${getSDGColor(sdgId)} text-white rounded-sm p-1.5 min-w-[45px] flex flex-col items-center justify-center`}
+                      >
+                        <span className="text-lg font-bold leading-none">{sdgId}</span>
+                        <span className="text-[6px] font-semibold text-center leading-tight mt-0.5 uppercase">
+                          {getSDGName(sdgId).split(' ')[0]}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+            <div className="p-4">
+              <div className="flex items-center text-sm text-gray-500 mb-2">
+                <span>{rel.author}</span>
+                <span className="mx-1">•</span>
+                <time>{new Date(rel.createdAt).toLocaleDateString()}</time>
+              </div>
+              <h3 className="font-bold text-gray-900 line-clamp-2 group-hover:text-green-700">
+                {rel.title}
+              </h3>
+              <p className="text-gray-700 text-sm mt-2 line-clamp-3">{rel.description}</p>
+            </div>
+          </div>
+        </Link>
+      ))}
+    </div>
+  </section>
+)}
               </div>
 
               {/* Sidebar: Social Links */}

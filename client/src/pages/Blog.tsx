@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
+
 const API_BASE = import.meta.env.VITE_API_BASE?.replace(/\/$/, "");
 
 interface Article {
@@ -12,6 +13,7 @@ interface Article {
   author: string;
   createdAt: string;
   slug: string;
+  sdgs: string[];
 }
 
 interface PublishedDocument {
@@ -98,6 +100,53 @@ export default function Blog() {
   const currentArticles = paginate(articles, currentPage, articlesPerPage);
   const currentDocuments = paginate(publishedDocuments, currentDocPage, documentsPerPage);
 
+  // SDG Color Mapping with official UN colors
+const getSDGColor = (sdgId: string): string => {
+  const sdgColors: { [key: string]: string } = {
+    '1': 'bg-[#E5243B]',
+    '2': 'bg-[#DDA63A]',
+    '3': 'bg-[#4C9F38]',
+    '4': 'bg-[#C5192D]',
+    '5': 'bg-[#FF3A21]',
+    '6': 'bg-[#26BDE2]',
+    '7': 'bg-[#FCC30B]',
+    '8': 'bg-[#A21942]',
+    '9': 'bg-[#FD6925]',
+    '10': 'bg-[#DD1367]',
+    '11': 'bg-[#FD9D24]',
+    '12': 'bg-[#BF8B2E]',
+    '13': 'bg-[#3F7E44]',
+    '14': 'bg-[#0A97D9]',
+    '15': 'bg-[#56C02B]',
+    '16': 'bg-[#00689D]',
+    '17': 'bg-[#19486A]'
+  };
+  return sdgColors[sdgId] || 'bg-gray-600';
+};
+
+const getSDGName = (sdgId: string): string => {
+  const sdgNames: { [key: string]: string } = {
+    '1': 'NO POVERTY',
+    '2': 'ZERO HUNGER',
+    '3': 'GOOD HEALTH AND WELL-BEING',
+    '4': 'QUALITY EDUCATION',
+    '5': 'GENDER EQUALITY',
+    '6': 'CLEAN WATER AND SANITATION',
+    '7': 'AFFORDABLE AND CLEAN ENERGY',
+    '8': 'DECENT WORK AND ECONOMIC GROWTH',
+    '9': 'INDUSTRY, INNOVATION AND INFRASTRUCTURE',
+    '10': 'REDUCED INEQUALITIES',
+    '11': 'SUSTAINABLE CITIES AND COMMUNITIES',
+    '12': 'RESPONSIBLE CONSUMPTION AND PRODUCTION',
+    '13': 'CLIMATE ACTION',
+    '14': 'LIFE BELOW WATER',
+    '15': 'LIFE ON LAND',
+    '16': 'PEACE, JUSTICE AND STRONG INSTITUTIONS',
+    '17': 'PARTNERSHIPS FOR THE GOALS'
+  };
+  return sdgNames[sdgId] || '';
+};
+
   // ===== Loader =====
   if (loading) {
     return (
@@ -164,14 +213,40 @@ export default function Blog() {
                     onClick={() => (window.location.href = `/blog/${article.slug}`)}
                     className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl cursor-pointer transform hover:-translate-y-1 transition-all"
                   >
-                    <img
-                      src={article.image}
-                      alt={article.title}
-                      className="w-full h-48 object-cover"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = "/images/placeholder.jpg";
-                      }}
-                    />
+                    <div className="relative">
+                      <img
+                        src={article.image}
+                        alt={article.title}
+                        className="w-full h-48 object-cover"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = "/images/placeholder.jpg";
+                        }}
+                      />
+                      {/* SDG Badges Overlay */}
+{article.sdgs && article.sdgs.length > 0 && (
+  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent p-4">
+    <div className="flex flex-wrap gap-2">
+      {article.sdgs.slice(0, 4).map((sdgId: string) => (
+        <div
+          key={sdgId}
+          className={`${getSDGColor(sdgId)} text-white rounded-sm p-2 min-w-[60px] flex flex-col items-center justify-center shadow-lg`}
+          title={`SDG ${sdgId}: ${getSDGName(sdgId)}`}
+        >
+          <span className="text-2xl font-bold leading-none">{sdgId}</span>
+          <span className="text-[8px] font-semibold text-center leading-tight mt-0.5 uppercase tracking-tighter">
+            {getSDGName(sdgId).split(' ').slice(0, 2).join(' ')}
+          </span>
+        </div>
+      ))}
+      {article.sdgs.length > 4 && (
+        <div className="bg-gray-800 text-white text-xs font-bold px-3 py-2 rounded-sm flex items-center justify-center">
+          +{article.sdgs.length - 4}
+        </div>
+      )}
+    </div>
+  </div>
+)}
+                    </div>
                     <div className="p-6">
                       <div className="text-sm text-gray-500 mb-2 flex gap-2 items-center">
                         <span className="text-green-700 font-medium">{article.author}</span>

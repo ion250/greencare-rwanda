@@ -5,6 +5,27 @@ import axios from 'axios';
 
 const API_BASE = import.meta.env.VITE_API_BASE;
 
+// All 17 UN SDGs
+const SDG_LIST = [
+  { id: 1, name: 'No Poverty', color: 'bg-red-600' },
+  { id: 2, name: 'Zero Hunger', color: 'bg-orange-500' },
+  { id: 3, name: 'Good Health and Well-being', color: 'bg-green-500' },
+  { id: 4, name: 'Quality Education', color: 'bg-red-500' },
+  { id: 5, name: 'Gender Equality', color: 'bg-orange-600' },
+  { id: 6, name: 'Clean Water and Sanitation', color: 'bg-cyan-500' },
+  { id: 7, name: 'Affordable and Clean Energy', color: 'bg-yellow-500' },
+  { id: 8, name: 'Decent Work and Economic Growth', color: 'bg-red-700' },
+  { id: 9, name: 'Industry, Innovation and Infrastructure', color: 'bg-orange-700' },
+  { id: 10, name: 'Reduced Inequalities', color: 'bg-pink-600' },
+  { id: 11, name: 'Sustainable Cities and Communities', color: 'bg-orange-400' },
+  { id: 12, name: 'Responsible Consumption and Production', color: 'bg-yellow-600' },
+  { id: 13, name: 'Climate Action', color: 'bg-green-600' },
+  { id: 14, name: 'Life Below Water', color: 'bg-blue-600' },
+  { id: 15, name: 'Life on Land', color: 'bg-green-700' },
+  { id: 16, name: 'Peace, Justice and Strong Institutions', color: 'bg-blue-700' },
+  { id: 17, name: 'Partnerships for the Goals', color: 'bg-navy-600' }
+];
+
 interface Article {
   _id: string;
   title: string;
@@ -13,6 +34,7 @@ interface Article {
   image: string;
   author: string;
   slug: string;
+  sdgs: string[];
   createdAt: string;
   updatedAt: string;
 }
@@ -24,6 +46,7 @@ interface FormData {
   author: string;
   image: File | null;
   imageUrl: string;
+  sdgs: string[];
 }
 
 export default function ArticleManagement() {
@@ -40,7 +63,8 @@ export default function ArticleManagement() {
     content: '',
     author: '',
     image: null,
-    imageUrl: ''
+    imageUrl: '',
+    sdgs: []
   });
 
   const navigate = useNavigate();
@@ -70,6 +94,7 @@ export default function ArticleManagement() {
 
       const formatted = res.data.articles.map((a: Article) => ({
         ...a,
+        sdgs: a.sdgs || [],
         image: a.image
           ? a.image.startsWith('http')
             ? a.image
@@ -106,9 +131,15 @@ export default function ArticleManagement() {
 
     const token = localStorage.getItem('authToken');
     const fd = new FormData();
-    Object.entries(formData).forEach(([key, value]) => {
-      if (value) fd.append(key, value);
-    });
+    fd.append('title', formData.title);
+    fd.append('description', formData.description);
+    fd.append('content', formData.content);
+    fd.append('author', formData.author);
+    if (formData.image) {
+      fd.append('image', formData.image);
+    }
+
+    fd.append('sdgs', JSON.stringify(formData.sdgs));
 
     try {
       if (editingArticle) {
@@ -121,7 +152,7 @@ export default function ArticleManagement() {
         });
       }
 
-      setFormData({ title: '', description: '', content: '', author: '', image: null, imageUrl: '' });
+      setFormData({ title: '', description: '', content: '', author: '', image: null, imageUrl: '', sdgs: [] });
       setShowAddArticle(false);
       setEditingArticle(null);
       fetchArticles();
@@ -139,7 +170,8 @@ export default function ArticleManagement() {
       content: article.content,
       author: article.author,
       image: null,
-      imageUrl: article.image || ''
+      imageUrl: article.image || '',
+      sdgs: article.sdgs || []
     });
     setShowAddArticle(true);
   };
@@ -159,11 +191,20 @@ export default function ArticleManagement() {
 
   const openAddArticleModal = () => {
     setEditingArticle(null);
-    setFormData({ title: '', description: '', content: '', author: '', image: null, imageUrl: '' });
+    setFormData({ title: '', description: '', content: '', author: '', image: null, imageUrl: '', sdgs: [] });
     setShowAddArticle(true);
   };
 
   const openPreview = (article: Article) => setPreviewArticle(article);
+
+  const toggleSDG = (sdgId: string) => {
+    setFormData(prev => ({
+      ...prev,
+      sdgs: prev.sdgs.includes(sdgId)
+        ? prev.sdgs.filter(id => id !== sdgId)
+        : [...prev.sdgs, sdgId]
+    }));
+  };
 
   if (loading) {
     return (
@@ -198,6 +239,7 @@ export default function ArticleManagement() {
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-48 max-w-60">Title</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-32">Author</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20">Image</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-40">SDGs</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-32">Created</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">Actions</th>
               </tr>
@@ -205,7 +247,7 @@ export default function ArticleManagement() {
             <tbody className="bg-white divide-y divide-gray-200">
               {articles.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-4 py-6 text-center text-gray-500">No articles found.</td>
+                  <td colSpan={6} className="px-4 py-6 text-center text-gray-500">No articles found.</td>
                 </tr>
               ) : (
                 articles.map((article) => (
@@ -223,6 +265,26 @@ export default function ArticleManagement() {
                           }}
                         />
                       ) : <span className="text-gray-400">—</span>}
+                    </td>
+                    <td className="px-4 py-4">
+                      <div className="flex flex-wrap gap-1">
+                        {article.sdgs && article.sdgs.length > 0 ? (
+                          article.sdgs.map((sdgId) => {
+                            const sdg = SDG_LIST.find(s => s.id.toString() === sdgId);
+                            return sdg ? (
+                              <span
+                                key={sdgId}
+                                className={`${sdg.color} text-white text-xs px-2 py-1 rounded font-semibold`}
+                                title={sdg.name}
+                              >
+                                {sdg.id}
+                              </span>
+                            ) : null;
+                          })
+                        ) : (
+                          <span className="text-gray-400 text-sm">—</span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-4 py-4 text-sm text-gray-500">{new Date(article.createdAt).toLocaleDateString()}</td>
                     <td className="px-4 py-4 text-sm font-medium space-y-1">
@@ -246,6 +308,7 @@ export default function ArticleManagement() {
           onChange={setFormData}
           onSubmit={handleSubmit}
           onClose={() => { setShowAddArticle(false); setEditingArticle(null); }}
+          toggleSDG={toggleSDG}
         />
       )}
 
@@ -278,15 +341,37 @@ function AddEditArticleModal({
   formData,
   onChange,
   onSubmit,
-  onClose
+  onClose,
+  toggleSDG
 }: {
   editing: boolean;
   formData: FormData;
   onChange: React.Dispatch<React.SetStateAction<FormData>>;
   onSubmit: (e: React.FormEvent) => void;
   onClose: () => void;
+  toggleSDG: (sdgId: string) => void;
 }) {
   const removeImage = () => onChange((prev) => ({ ...prev, image: null, imageUrl: '' }));
+
+  const SDG_LIST = [
+    { id: 1, name: 'No Poverty', color: 'bg-red-600' },
+    { id: 2, name: 'Zero Hunger', color: 'bg-orange-500' },
+    { id: 3, name: 'Good Health and Well-being', color: 'bg-green-500' },
+    { id: 4, name: 'Quality Education', color: 'bg-red-500' },
+    { id: 5, name: 'Gender Equality', color: 'bg-orange-600' },
+    { id: 6, name: 'Clean Water and Sanitation', color: 'bg-cyan-500' },
+    { id: 7, name: 'Affordable and Clean Energy', color: 'bg-yellow-500' },
+    { id: 8, name: 'Decent Work and Economic Growth', color: 'bg-red-700' },
+    { id: 9, name: 'Industry, Innovation and Infrastructure', color: 'bg-orange-700' },
+    { id: 10, name: 'Reduced Inequalities', color: 'bg-pink-600' },
+    { id: 11, name: 'Sustainable Cities and Communities', color: 'bg-orange-400' },
+    { id: 12, name: 'Responsible Consumption and Production', color: 'bg-yellow-600' },
+    { id: 13, name: 'Climate Action', color: 'bg-green-600' },
+    { id: 14, name: 'Life Below Water', color: 'bg-blue-600' },
+    { id: 15, name: 'Life on Land', color: 'bg-green-700' },
+    { id: 16, name: 'Peace, Justice and Strong Institutions', color: 'bg-blue-700' },
+    { id: 17, name: 'Partnerships for the Goals', color: 'bg-indigo-600' }
+  ];
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -358,6 +443,51 @@ function AddEditArticleModal({
               />
               <p className="text-xs text-gray-500 mt-2">Plain text only. Press Enter for new paragraph.</p>
             </div>
+          </div>
+
+          {/* SDG Selection */}
+          <div className="space-y-2">
+            <h4 className="text-lg font-semibold text-gray-800 border-b pb-2">Sustainable Development Goals (SDGs)</h4>
+            <p className="text-sm text-gray-600 mb-3">Select all SDGs that apply to your article</p>
+            <div className="flex flex-wrap gap-2">
+              {SDG_LIST.map((sdg) => {
+                const isSelected = formData.sdgs.includes(sdg.id.toString());
+                return (
+                  <button
+                    key={sdg.id}
+                    type="button"
+                    onClick={() => toggleSDG(sdg.id.toString())}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-lg border-2 transition-all ${
+                      isSelected
+                        ? `${sdg.color} border-${sdg.color.replace('bg-', '')} text-white`
+                        : 'bg-gray-100 border-gray-300 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    <span className="font-bold text-sm">{sdg.id}</span>
+                    <span className="text-xs font-medium hidden sm:inline">{sdg.name}</span>
+                    {isSelected && <span className="ml-1">✓</span>}
+                  </button>
+                );
+              })}
+            </div>
+            {formData.sdgs.length > 0 && (
+              <div className="mt-3 p-3 bg-gray-50 rounded-lg">
+                <p className="text-sm text-gray-700 font-medium mb-2">Selected SDGs:</p>
+                <div className="flex flex-wrap gap-2">
+                  {formData.sdgs.map((sdgId) => {
+                    const sdg = SDG_LIST.find(s => s.id.toString() === sdgId);
+                    return sdg ? (
+                      <span
+                        key={sdgId}
+                        className={`${sdg.color} text-white text-xs px-3 py-1 rounded-full font-semibold`}
+                      >
+                        {sdg.id}. {sdg.name}
+                      </span>
+                    ) : null;
+                  })}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Featured Image */}

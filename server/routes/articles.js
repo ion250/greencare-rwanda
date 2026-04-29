@@ -78,7 +78,7 @@ router.get('/:slug', async (req, res) => {
 // ✅ CREATE new article (protected)
 router.post('/', authenticate, upload.single('image'), async (req, res) => {
   try {
-    const { title, description, content, author } = req.body;
+    const { title, description, content, author, sdgs } = req.body; // ✅ Added sdgs
 
     // Validation
     if (!title || !description || !content || !author) {
@@ -97,13 +97,25 @@ router.post('/', authenticate, upload.single('image'), async (req, res) => {
     // Handle uploaded image
     const imageUrl = req.file ? `/uploads/${req.file.filename}` : '';
 
+    // ✅ Handle SDGs: convert to array if string or multiple values
+    let sdgsArray = [];
+
+if (sdgs) {
+  try {
+    sdgsArray = JSON.parse(sdgs);
+  } catch (error) {
+    sdgsArray = [];
+  }
+}
+
     const article = new Article({
       title,
       description,
       content,
       author,
       slug,
-      image: imageUrl
+      image: imageUrl,
+      sdgs: sdgsArray // ✅ Added SDGs
     });
 
     await article.save();
@@ -123,7 +135,7 @@ router.post('/', authenticate, upload.single('image'), async (req, res) => {
 router.put('/:id', authenticate, upload.single('image'), async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, description, content, author } = req.body;
+    const { title, description, content, author, sdgs } = req.body; // ✅ Added sdgs
 
     const article = await Article.findById(id);
     if (!article) {
@@ -137,6 +149,19 @@ router.put('/:id', authenticate, upload.single('image'), async (req, res) => {
     if (description) article.description = description;
     if (content) article.content = content;
     if (author) article.author = author;
+
+    // ✅ Update SDGs if provided
+    if (sdgs !== undefined) {
+  let sdgsArray = [];
+
+  try {
+    sdgsArray = JSON.parse(sdgs);
+  } catch (error) {
+    sdgsArray = [];
+  }
+
+  article.sdgs = sdgsArray;
+}
 
     if (req.file) {
       if (article.image) {

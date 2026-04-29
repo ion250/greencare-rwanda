@@ -25,6 +25,11 @@ const articleSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true
+  },
+  // ✅ ADDED: SDGs field
+  sdgs: {
+    type: [String],
+    default: []
   }
 }, {
   timestamps: true
