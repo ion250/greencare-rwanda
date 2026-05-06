@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-
 const API_BASE = import.meta.env.VITE_API_BASE?.replace(/\/$/, "");
 
 interface Article {
@@ -75,7 +74,6 @@ export default function Blog() {
 
         setArticles(formattedArticles);
 
-        // ✅ Published Documents 
         const { data: docData } = await axios.get(`${API_BASE}/api/documents`);
         const sortedDocs = docData.documents.sort(
           (a: PublishedDocument, b: PublishedDocument) =>
@@ -101,51 +99,171 @@ export default function Blog() {
   const currentDocuments = paginate(publishedDocuments, currentDocPage, documentsPerPage);
 
   // SDG Color Mapping with official UN colors
-const getSDGColor = (sdgId: string): string => {
-  const sdgColors: { [key: string]: string } = {
-    '1': 'bg-[#E5243B]',
-    '2': 'bg-[#DDA63A]',
-    '3': 'bg-[#4C9F38]',
-    '4': 'bg-[#C5192D]',
-    '5': 'bg-[#FF3A21]',
-    '6': 'bg-[#26BDE2]',
-    '7': 'bg-[#FCC30B]',
-    '8': 'bg-[#A21942]',
-    '9': 'bg-[#FD6925]',
-    '10': 'bg-[#DD1367]',
-    '11': 'bg-[#FD9D24]',
-    '12': 'bg-[#BF8B2E]',
-    '13': 'bg-[#3F7E44]',
-    '14': 'bg-[#0A97D9]',
-    '15': 'bg-[#56C02B]',
-    '16': 'bg-[#00689D]',
-    '17': 'bg-[#19486A]'
+  const getSDGColor = (sdgId: string): string => {
+    const sdgColors: { [key: string]: string } = {
+      '1': 'bg-[#E5243B]',
+      '2': 'bg-[#DDA63A]',
+      '3': 'bg-[#4C9F38]',
+      '4': 'bg-[#C5192D]',
+      '5': 'bg-[#FF3A21]',
+      '6': 'bg-[#26BDE2]',
+      '7': 'bg-[#FCC30B]',
+      '8': 'bg-[#A21942]',
+      '9': 'bg-[#FD6925]',
+      '10': 'bg-[#DD1367]',
+      '11': 'bg-[#FD9D24]',
+      '12': 'bg-[#BF8B2E]',
+      '13': 'bg-[#3F7E44]',
+      '14': 'bg-[#0A97D9]',
+      '15': 'bg-[#56C02B]',
+      '16': 'bg-[#00689D]',
+      '17': 'bg-[#19486A]'
+    };
+    return sdgColors[sdgId] || 'bg-gray-600';
   };
-  return sdgColors[sdgId] || 'bg-gray-600';
-};
 
-const getSDGName = (sdgId: string): string => {
-  const sdgNames: { [key: string]: string } = {
-    '1': 'NO POVERTY',
-    '2': 'ZERO HUNGER',
-    '3': 'GOOD HEALTH AND WELL-BEING',
-    '4': 'QUALITY EDUCATION',
-    '5': 'GENDER EQUALITY',
-    '6': 'CLEAN WATER AND SANITATION',
-    '7': 'AFFORDABLE AND CLEAN ENERGY',
-    '8': 'DECENT WORK AND ECONOMIC GROWTH',
-    '9': 'INDUSTRY, INNOVATION AND INFRASTRUCTURE',
-    '10': 'REDUCED INEQUALITIES',
-    '11': 'SUSTAINABLE CITIES AND COMMUNITIES',
-    '12': 'RESPONSIBLE CONSUMPTION AND PRODUCTION',
-    '13': 'CLIMATE ACTION',
-    '14': 'LIFE BELOW WATER',
-    '15': 'LIFE ON LAND',
-    '16': 'PEACE, JUSTICE AND STRONG INSTITUTIONS',
-    '17': 'PARTNERSHIPS FOR THE GOALS'
+  const getSDGName = (sdgId: string): string => {
+    const sdgNames: { [key: string]: string } = {
+      '1': 'NO POVERTY',
+      '2': 'ZERO HUNGER',
+      '3': 'GOOD HEALTH',
+      '4': 'EDUCATION',
+      '5': 'GENDER EQUALITY',
+      '6': 'CLEAN WATER',
+      '7': 'CLEAN ENERGY',
+      '8': 'DECENT WORK',
+      '9': 'INDUSTRY',
+      '10': 'INEQUALITIES',
+      '11': 'CITIES',
+      '12': 'CONSUMPTION',
+      '13': 'CLIMATE ACTION',
+      '14': 'LIFE BELOW WATER',
+      '15': 'LIFE ON LAND',
+      '16': 'PEACE & JUSTICE',
+      '17': 'PARTNERSHIPS'
+    };
+    return sdgNames[sdgId] || '';
   };
-  return sdgNames[sdgId] || '';
-};
+
+    // ✅ Compact SDG Icons (Fixed duplicate fill warning)
+  const getSDGIcon = (sdgId: string) => {
+    const icons: { [key: string]: JSX.Element } = {
+      '1': (
+        <svg viewBox="0 0 100 100" className="w-4 h-4">
+          <path fill="white" d="M50 20c-8 0-15 6-15 15 0 5 2 9 6 12l-11 33h40l-11-33c4-3 6-7 6-12 0-9-7-15-15-15z M35 35c0-8 7-15 15-15s15 7 15 15-7 15-15 15-15-7-15-15z M20 80h60v10H20V80z"/>
+        </svg>
+      ),
+      '2': (
+        <svg viewBox="0 0 100 100" className="w-4 h-4">
+          <path fill="white" d="M50 15c-3 0-5 2-5 5v5h10v-5c0-3-2-5-5-5z M30 35c-5 0-10 4-10 10v25h60V45c0-6-5-10-10-10H30z M25 50h10v15H25V50z M40 50h10v15H40V50z M55 50h10v15H55V50z M30 75h40v10H30V75z M70 50h5v10h-5V50z"/>
+        </svg>
+      ),
+      '3': (
+        <svg viewBox="0 0 100 100" className="w-4 h-4">
+          <path fill="white" d="M50 20c-17 0-30 13-30 30s13 30 30 30 30-13 30-30-13-30-30-30z M50 75c-14 0-25-11-25-25s11-25 25-25 25 11 25 25-11 25-25 25z M45 35h10v20H45V35z M45 60h10v10H45V60z"/>
+          <circle fill="white" cx="70" cy="30" r="8"/>
+        </svg>
+      ),
+      '4': (
+        <svg viewBox="0 0 100 100" className="w-4 h-4">
+          <path fill="white" d="M50 15L20 35v50h60V35L50 15z M45 30h10v5H45V30z M30 45h40v30H30V45z M70 40h5v5h-5V40z"/>
+        </svg>
+      ),
+      '5': (
+        <svg viewBox="0 0 100 100" className="w-4 h-4">
+          <circle fill="white" cx="50" cy="35" r="12"/>
+          <path fill="white" d="M50 50c-15 0-25 10-25 20v15h50V70c0-10-10-20-25-20z M35 55h30v5H35V55z"/>
+          <path fill="white" d="M65 25h10v10H65V25z M25 25h10v10H25V25z"/>
+        </svg>
+      ),
+      '6': (
+        <svg viewBox="0 0 100 100" className="w-4 h-4">
+          <path fill="white" d="M50 20c-15 0-25 10-25 25 0 10 5 18 15 22v18h20V67c10-4 15-12 15-22 0-15-10-25-25-25z M50 65c-11 0-20-9-20-20s9-20 20-20 20 9 20 20-9 20-20 20z M45 35h10v20H45V35z"/>
+        </svg>
+      ),
+      '7': (
+        <svg viewBox="0 0 100 100" className="w-4 h-4">
+          <circle fill="white" cx="50" cy="50" r="20"/>
+          <path fill="white" d="M50 15v10M50 75v10M15 50h10M75 50h10M25 25l7 7M68 68l7 7M25 75l7-7M68 32l7-7"/>
+        </svg>
+      ),
+      '8': (
+        <svg viewBox="0 0 100 100" className="w-4 h-4">
+          <path fill="white" d="M20 70l15-30 15 20 20-35 10 45H20z M35 45l10 13 18-31 8 38H28l7-20z"/>
+        </svg>
+      ),
+      '9': (
+        <svg viewBox="0 0 100 100" className="w-4 h-4">
+          <path fill="white" d="M30 40l20-10 20 10v35H30V40z M50 35l-15 8 15 7 15-7-15-8z M35 48v30h30V48l-15 7-15-7z"/>
+          <rect fill="white" x="20" y="55" width="10" height="20"/>
+          <rect fill="white" x="70" y="55" width="10" height="20"/>
+        </svg>
+      ),
+      '10': (
+        <svg viewBox="0 0 100 100" className="w-4 h-4">
+          <path fill="white" d="M20 45h60v10H20V45z M30 30h40v10H30V30z M30 60h40v10H30V60z"/>
+          <path fill="white" d="M15 50l10-5v10l-10-5z M85 50l-10-5v10l10-5z"/>
+        </svg>
+      ),
+      '11': (
+        <svg viewBox="0 0 100 100" className="w-4 h-4">
+          <rect fill="white" x="20" y="40" width="15" height="40"/>
+          <rect fill="white" x="40" y="25" width="15" height="55"/>
+          <rect fill="white" x="60" y="35" width="20" height="45"/>
+          <rect fill="white" x="25" y="50" width="5" height="5"/>
+          <rect fill="white" x="45" y="35" width="5" height="5"/>
+          <rect fill="white" x="65" y="45" width="5" height="5"/>
+          <rect fill="white" x="75" y="45" width="5" height="5"/>
+        </svg>
+      ),
+      '12': (
+        <svg viewBox="0 0 100 100" className="w-4 h-4">
+          <path fill="white" d="M50 25c-14 0-25 11-25 25s11 25 25 25 25-11 25-25-11-25-25-25z M50 70c-11 0-20-9-20-20s9-20 20-20 20 9 20 20-9 20-20 20z"/>
+          <path fill="white" d="M50 35c-8 0-15 7-15 15s7 15 15 15 15-7 15-15-7-15-15-15z M50 60c-6 0-10-4-10-10s4-10 10-10 10 4 10 10-4 10-10 10z"/>
+        </svg>
+      ),
+      '13': (
+        <svg viewBox="0 0 100 100" className="w-4 h-4">
+          <circle fill="white" cx="50" cy="50" r="25"/>
+          <path fill="white" d="M50 30c-11 0-20 9-20 20s9 20 20 20 20-9 20-20-9-20-20-20z M35 50h30v5H35V50z M50 35v30h-5V35h5z"/>
+          <path fill="white" d="M20 25l5 5M75 75l5 5M20 75l5-5M75 25l5-5"/>
+        </svg>
+      ),
+      '14': (
+        <svg viewBox="0 0 100 100" className="w-4 h-4">
+          <path fill="white" d="M50 35c-8 0-15 7-15 15s7 15 15 15 15-7 15-15-7-15-15-15z M50 60c-6 0-10-4-10-10s4-10 10-10 10 4 10 10-4 10-10 10z"/>
+          <path fill="white" d="M20 70c10-5 20-5 30 0s20 5 30 0v10H20V70z M25 55c8-4 16-4 25 0s17 4 25 0v5c-8 4-16 4-25 0s-17-4-25 0v-5z"/>
+        </svg>
+      ),
+      '15': (
+        <svg viewBox="0 0 100 100" className="w-4 h-4">
+          <circle fill="white" cx="50" cy="35" r="15"/>
+          <rect fill="white" x="45" y="50" width="10" height="25"/>
+          <path fill="white" d="M25 75h50v10H25V75z"/>
+          <circle fill="white" cx="35" cy="45" r="3"/>
+          <circle fill="white" cx="65" cy="45" r="3"/>
+        </svg>
+      ),
+      '16': (
+        <svg viewBox="0 0 100 100" className="w-4 h-4">
+          <path fill="white" d="M50 25l-20 10v35l20 10 20-10V35L50 25z M50 30l15 8v30l-15 8-15-8V38l15-8z"/>
+          <path fill="white" d="M45 45h10v25H45V45z M50 35l-3 2v18h6V37l-3-2z"/>
+          <circle fill="white" cx="70" cy="30" r="5"/>
+        </svg>
+      ),
+      '17': (
+        <svg viewBox="0 0 100 100" className="w-4 h-4">
+          {/* ✅ FIXED: Removed duplicate fill="white" */}
+          <circle fill="none" cx="50" cy="50" r="20" stroke="white" strokeWidth="3" />
+          <circle fill="white" cx="50" cy="30" r="8"/>
+          <circle fill="white" cx="70" cy="50" r="8"/>
+          <circle fill="white" cx="50" cy="70" r="8"/>
+          <circle fill="white" cx="30" cy="50" r="8"/>
+        </svg>
+      )
+    };
+    return icons[sdgId] || null;
+  };
 
   // ===== Loader =====
   if (loading) {
@@ -222,30 +340,35 @@ const getSDGName = (sdgId: string): string => {
                           (e.target as HTMLImageElement).src = "/images/placeholder.jpg";
                         }}
                       />
-                      {/* SDG Badges Overlay */}
-{article.sdgs && article.sdgs.length > 0 && (
-  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent p-4">
-    <div className="flex flex-wrap gap-2">
-      {article.sdgs.slice(0, 4).map((sdgId: string) => (
-        <div
-          key={sdgId}
-          className={`${getSDGColor(sdgId)} text-white rounded-sm p-2 min-w-[60px] flex flex-col items-center justify-center shadow-lg`}
-          title={`SDG ${sdgId}: ${getSDGName(sdgId)}`}
-        >
-          <span className="text-2xl font-bold leading-none">{sdgId}</span>
-          <span className="text-[8px] font-semibold text-center leading-tight mt-0.5 uppercase tracking-tighter">
-            {getSDGName(sdgId).split(' ').slice(0, 2).join(' ')}
-          </span>
-        </div>
-      ))}
-      {article.sdgs.length > 4 && (
-        <div className="bg-gray-800 text-white text-xs font-bold px-3 py-2 rounded-sm flex items-center justify-center">
-          +{article.sdgs.length - 4}
-        </div>
-      )}
-    </div>
-  </div>
-)}
+                      {/* ✅ COMPACT: Small SDG Badges with Icons */}
+                      {article.sdgs && article.sdgs.length > 0 && (
+                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent p-2">
+                          <div className="flex flex-wrap gap-1.5">
+                            {article.sdgs.slice(0, 4).map((sdgId: string) => (
+                              <div
+                                key={sdgId}
+                                className={`${getSDGColor(sdgId)} text-white rounded-sm p-1 min-w-[60px] flex flex-col items-center justify-center shadow-lg`}
+                                title={`SDG ${sdgId}: ${getSDGName(sdgId)}`}
+                              >
+                                {/* SDG Number & Icon Row */}
+                                <div className="flex items-center gap-0.5 mb-0.5">
+                                  <span className="text-xs font-bold leading-none">{sdgId}</span>
+                                  {getSDGIcon(sdgId)}
+                                </div>
+                                {/* SDG Name */}
+                                <span className="text-[5px] font-bold text-center leading-tight uppercase tracking-tighter">
+                                  {getSDGName(sdgId)}
+                                </span>
+                              </div>
+                            ))}
+                            {article.sdgs.length > 4 && (
+                              <div className="bg-gray-800 text-white text-[10px] font-bold px-2 py-1 rounded-sm flex items-center justify-center">
+                                +{article.sdgs.length - 4}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
                     </div>
                     <div className="p-6">
                       <div className="text-sm text-gray-500 mb-2 flex gap-2 items-center">
@@ -291,7 +414,7 @@ const getSDGName = (sdgId: string): string => {
           )}
         </div>
 
-        {/* ===== Documents Sidebar (UNCHANGED) ===== */}
+        {/* ===== Documents Sidebar ===== */}
         <aside className="bg-white rounded-2xl shadow-md p-6 h-fit sticky top-20">
           <h2 className="text-2xl font-bold text-green-800 mb-6">Published Documents</h2>
 
