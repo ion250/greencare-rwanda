@@ -74,7 +74,14 @@ export default function Home() {
     "/images/workers12.jpg",
     "/images/workers13.jpg",
     "/images/workers14.jpg",
-    "/images/workers15.png"
+    "/images/workers15.png",
+    "/images/W1.jpg",
+    "/images/W2.jpg",
+    "/images/W3.jpg",
+    "/images/W4.JPG",
+    "/images/W5.jpg",
+    "/images/W6.JPG",
+    
   ];
 
   useEffect(() => {
